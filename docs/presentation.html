@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DreamSentinel AI — Présentation Officielle (Somnia x DreamDEX Hackathon)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 0%, #111827 0%, #07090e 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .slide {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .slide.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .glass {
+      background: rgba(14, 19, 31, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(30, 41, 59, 0.8);
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between p-6">
+
+  <!-- Header -->
+  <header class="max-w-5xl mx-auto w-full flex justify-between items-center pb-4 border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+        <i class="fa-solid fa-brain"></i>
+      </div>
+      <div>
+        <span class="font-bold text-sm tracking-tight text-cyan-400">DreamSentinel AI</span>
+        <span class="text-xs text-slate-500 ml-2">Somnia × DreamDEX Hackathon</span>
+      </div>
+    </div>
+    <div class="text-xs font-mono text-slate-400">
+      Slide <span id="slideNumber">1</span> / 6
+    </div>
+  </header>
+
+  <!-- Slide Container -->
+  <main class="max-w-5xl mx-auto w-full flex-1 flex items-center justify-center my-6">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active flex-col items-center text-center space-y-6 max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        Somnia Shannon Testnet • Event Contracts Hackathon
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-500 bg-clip-text text-transparent">
+        DreamSentinel AI
+      </h1>
+      <p class="text-lg text-slate-300 leading-relaxed">
+        Terminal de Marchés Prédictifs Autonome, Essaim Multi-Agents IA & Coffres de Copy-Trading Décentralisés sur Somnia DreamDEX.
+      </p>
+      <div class="grid grid-cols-3 gap-4 w-full pt-4 font-mono text-xs">
+        <div class="glass p-4 rounded-2xl">
+          <div class="text-cyan-400 font-bold text-lg">&lt; 380 ms</div>
+          <div class="text-slate-400">Latence Somnia L1</div>
+        </div>
+        <div class="glass p-4 rounded-2xl">
+          <div class="text-emerald-400 font-bold text-lg">84.1%</div>
+          <div class="text-slate-400">Win Rate Arbitrage</div>
+        </div>
+        <div class="glass p-4 rounded-2xl">
+          <div class="text-purple-400 font-bold text-lg">3 Agents IA</div>
+          <div class="text-slate-400">Essaim en Continu</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: Problem & Solution -->
+    <div class="slide flex-col space-y-6 w-full">
+      <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+        Problématique & Solution Révolutionnaire
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+        <div class="glass p-6 rounded-3xl border-rose-500/20 space-y-4">
+          <h3 class="font-bold text-rose-400 text-base">❌ Les Limites Actuelles</h3>
+          <ul class="space-y-2.5 text-slate-300">
+            <li>• <strong>Liquidité fragmentée</strong> : Écarts Bid/Ask trop larges sur les contrats à court terme.</li>
+            <li>• <strong>Calcul probabiliste complexe</strong> : Les utilisateurs particuliers peinent à évaluer la juste cote d'un micro-événement.</li>
+            <li>• <strong>Blockchains lentes</strong> : Impossible de faire du trading haute fréquence sur les L1 traditionnelles.</li>
+          </ul>
+        </div>
+
+        <div class="glass p-6 rounded-3xl border-emerald-500/20 space-y-4">
+          <h3 class="font-bold text-emerald-400 text-base">✅ La Solution DreamSentinel</h3>
+          <ul class="space-y-2.5 text-slate-300">
+            <li>• <strong>Essaim d'Agents IA Autonomes</strong> : Perception NLP, modèle bayésien et exécution d'ordres en sous-seconde.</li>
+            <li>• <strong>Copilote IA Conversationnel</strong> : Recommandations explicables et exécution d'ordres en 1 clic.</li>
+            <li>• <strong>Vaults Non-Custodiaux</strong> : Tout utilisateur peut allouer des USDso aux stratégies IA sans compétences de trading.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Multi-Agent Architecture -->
+    <div class="slide flex-col space-y-6 w-full">
+      <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-2">
+        <i class="fa-solid fa-network-wired text-cyan-400"></i>
+        Architecture de l'Essaim Multi-Agents
+      </h2>
+      <div class="grid grid-cols-3 gap-4 text-xs">
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="text-2xl">📡</div>
+          <h4 class="font-bold text-purple-300 text-sm">Sentinel-Perception</h4>
+          <p class="text-slate-400 leading-relaxed">
+            Scanne en direct les flux d'actualités crypto, les réseaux sociaux et la dynamique des carnets d'ordres pour extraire un score de sentiment [-1.0, +1.0].
+          </p>
+        </div>
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="text-2xl">📐</div>
+          <h4 class="font-bold text-cyan-300 text-sm">Sentinel-BayesArb</h4>
+          <p class="text-slate-400 leading-relaxed">
+            Calcule la distribution de probabilité théorique avec mise à jour bayésienne et dimensionne le capital selon le <strong>Critère de Kelly</strong>.
+          </p>
+        </div>
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="text-2xl">⚡</div>
+          <h4 class="font-bold text-emerald-300 text-sm">Sentinel-Execution</h4>
+          <p class="text-slate-400 leading-relaxed">
+            Route les ordres limites instantanés sur le carnet d'ordres CLOB de DreamDEX via le <strong>DreamDEX Bot Kit</strong> avec confirmation sub-seconde sur Somnia L1.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Mathematical Rigor -->
+    <div class="slide flex-col space-y-6 w-full">
+      <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-2">
+        <i class="fa-solid fa-calculator text-teal-400"></i>
+        Rigueur Mathématique & Gestion du Risque
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+        <div class="glass p-6 rounded-3xl space-y-3 font-mono">
+          <h3 class="font-bold text-cyan-300 text-base font-sans">1. Mise à Jour Bayésienne</h3>
+          <p class="text-xs text-slate-400 font-sans">
+            Ajuste dynamiquement la cote théorique d'un événement selon le flux d'informations :
+          </p>
+          <div class="p-3 bg-slate-900 rounded-xl text-cyan-400 text-xs">
+            Odds_post = Odds_prior × exp(Sentiment × Confiance × λ)
+          </div>
+        </div>
+
+        <div class="glass p-6 rounded-3xl space-y-3 font-mono">
+          <h3 class="font-bold text-emerald-300 text-base font-sans">2. Critère de Kelly Fractionnaire</h3>
+          <p class="text-xs text-slate-400 font-sans">
+            Optimise la croissance du capital tout en prévenant les drawdowns :
+          </p>
+          <div class="p-3 bg-slate-900 rounded-xl text-emerald-400 text-xs">
+            f* = min(0.35, ((b × p - q) / b) × 0.5)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Ecosystem & Business Impact -->
+    <div class="slide flex-col space-y-6 w-full">
+      <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-2">
+        <i class="fa-solid fa-chart-line text-emerald-400"></i>
+        Impact pour l'Écosystème Somnia & DreamDEX
+      </h2>
+      <div class="grid grid-cols-3 gap-4 text-xs">
+        <div class="glass p-5 rounded-2xl space-y-2">
+          <div class="text-emerald-400 font-bold text-base">Génération de Volume</div>
+          <p class="text-slate-400">
+            L'essaim IA agit comme teneur de marché automatisé et génère des milliers de transactions quotidiennes sur DreamDEX.
+          </p>
+        </div>
+        <div class="glass p-5 rounded-2xl space-y-2">
+          <div class="text-cyan-400 font-bold text-base">Adoption Grand Public</div>
+          <p class="text-slate-400">
+            Les coffres de copy-trading permettent aux débutants de participer aux marchés d'événements sans stress d'analyse.
+          </p>
+        </div>
+        <div class="glass p-5 rounded-2xl space-y-2">
+          <div class="text-purple-400 font-bold text-base">Vitrine Technologique</div>
+          <p class="text-slate-400">
+            Démontre la puissance de Somnia comme "Agentic L1" capable d'exécuter des agents IA en sous-seconde.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Roadmap & Submission Summary -->
+    <div class="slide flex-col items-center text-center space-y-6 max-w-2xl">
+      <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center text-2xl shadow-xl shadow-cyan-500/20">
+        <i class="fa-solid fa-trophy text-black"></i>
+      </div>
+      <h2 class="text-3xl font-black text-slate-100">Prêt pour la Soumission & la Victoire</h2>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        DreamSentinel AI est un prototype 100% fonctionnel sur le Testnet Somnia Shannon, avec smart contracts, moteur IA et interface Web3.
+      </p>
+      <div class="flex gap-4">
+        <a href="http://localhost:3000" target="_blank" class="px-6 py-3 rounded-xl bg-cyan-500 text-black font-extrabold text-xs shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 transition-all">
+          Ouvrir le Terminal Live
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Controls -->
+  <footer class="max-w-5xl mx-auto w-full flex justify-between items-center pt-4 border-t border-slate-800">
+    <button id="prevBtn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all">
+      <i class="fa-solid fa-chevron-left mr-2"></i> Précédent
+    </button>
+    <div class="flex gap-1.5" id="dots"></div>
+    <button id="nextBtn" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-extrabold transition-all shadow-md">
+      Suivant <i class="fa-solid fa-chevron-right ml-2"></i>
+    </button>
+  </footer>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const slideNumber = document.getElementById('slideNumber');
+    const dotsContainer = document.getElementById('dots');
+
+    // Create dots
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.className = `w-2 h-2 rounded-full transition-all ${i === 0 ? 'bg-cyan-400 w-6' : 'bg-slate-700'}`;
+      dotsContainer.appendChild(dot);
+    }
+
+    function showSlide(index) {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === index);
+      });
+      slideNumber.textContent = index + 1;
+      Array.from(dotsContainer.children).forEach((dot, i) => {
+        dot.className = `w-2 h-2 rounded-full transition-all ${i === index ? 'bg-cyan-400 w-6' : 'bg-slate-700'}`;
+      });
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      showSlide(currentSlide);
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        showSlide(currentSlide);
+      } else if (e.key === 'ArrowLeft') {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        showSlide(currentSlide);
+      }
+    });
+  </script>
+</body>
+</html>

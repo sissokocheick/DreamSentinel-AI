@@ -1,0 +1,16 @@
+{
+  "name": "dream-sentinel-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for DreamSentinel AI on Somnia L1",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:somnia": "hardhat run deploy.js --network somniaTestnet"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.2"
+  }
+}
