@@ -320,18 +320,19 @@ async def scan_arbitrage_opportunities():
                 sentiment_confidence=0.5
             )
             
-            if analysis.edge > 0.02: # Only 2% edge or more
+            edge = max(analysis.edge_yes, analysis.edge_no)
+            if edge > 0.02: # Only 2% edge or more
                 opportunities.append({
-                    "market_id": market.id,
+                    "market_id": market.market_id,
                     "symbol": market.symbol,
                     "type": "STAT_ARB",
-                    "description": f"Différence probabiliste de {(analysis.edge * 100):.1f}% détectée.",
-                    "side": analysis.recommended_side,
-                    "edge": analysis.edge,
-                    "confidence": analysis.confidence,
+                    "description": f"Différence probabiliste de {(edge * 100):.1f}% détectée.",
+                    "side": analysis.recommended_outcome,
+                    "edge": edge,
+                    "confidence": analysis.expected_value_pct, # Mapped to confidence for UI
                     "kelly_fraction": analysis.kelly_fraction,
-                    "model_prob": analysis.model_prob,
-                    "market_prob": market.yes_prob if analysis.recommended_side == 'YES' else market.no_prob,
+                    "model_prob": analysis.posterior_prob_yes if analysis.recommended_outcome == 'YES' else (1 - analysis.posterior_prob_yes),
+                    "market_prob": market.implied_prob_yes if analysis.recommended_outcome == 'YES' else (1 - market.implied_prob_yes),
                     "timestamp": int(time.time())
                 })
         
