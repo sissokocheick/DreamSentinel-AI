@@ -309,13 +309,13 @@ async def scan_arbitrage_opportunities():
         
         # We simulate a scan by finding markets with the highest difference between model prob and market prob
         for market in markets:
-            analysis = quant_engine.analyze_market(
-                market_id=market.id,
+            analysis = swarm.quant_engine.analyze_market(
+                market_id=market.market_id,
                 symbol=market.symbol,
-                current_spot=0.0, # We'd need actual spot, but for scan we mock or use default
+                current_spot=market.current_spot,
                 strike_price=market.strike_price,
-                time_to_expiry_seconds=(market.expiry_time - int(time.time())),
-                market_implied_prob_yes=market.yes_prob,
+                time_to_expiry_seconds=(market.expiry_timestamp - int(time.time())),
+                market_implied_prob_yes=market.implied_prob_yes,
                 sentiment_score=0.5,
                 sentiment_confidence=0.5
             )
