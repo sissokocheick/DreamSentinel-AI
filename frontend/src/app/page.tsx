@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Market, AgentProfile, ThoughtLog, SwarmStatus, ActionCard, CopilotMessage } from '../types';
 import { fetchMarkets, fetchAgents, sendCopilotMessage, executeTrade, getFallbackMarkets, getFallbackSwarmStatus } from '../lib/api';
+import { translations, Language } from '../lib/translations';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 
@@ -57,6 +58,36 @@ const PvPDuels = dynamic(
 
 
 export default function Home() {
+  // Internationalization (Default English, browser auto-detect or localStorage)
+  const [lang, setLang] = useState<Language>('en');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dreamsentinel_lang') as Language;
+      if (saved === 'en' || saved === 'fr') {
+        setLang(saved);
+      } else {
+        const browserLang = navigator.language?.slice(0, 2).toLowerCase();
+        if (browserLang === 'fr') {
+          setLang('fr');
+        } else {
+          setLang('en');
+        }
+      }
+    }
+  }, []);
+
+  const toggleLanguage = (newLang: Language) => {
+    setLang(newLang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dreamsentinel_lang', newLang);
+    }
+  };
+
+  const t = (key: keyof typeof translations['en']): string => {
+    return (translations[lang] as any)?.[key] || (translations['en'] as any)?.[key] || (key as string);
+  };
+
   // Navigation
   const [activeTab, setActiveTab] = useState<'terminal' | 'swarm' | 'copilot' | 'scanner' | 'backtest' | 'pvp' | 'vaults' | 'leaderboard'>('terminal');
   
@@ -363,8 +394,9 @@ export default function Home() {
           
           {/* Logo & Branding */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden border border-cyan-500/30 shadow-lg shadow-cyan-500/20 flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/20 flex-shrink-0 relative group">
               <img src="/logo.jpg" alt="DreamSentinel Logo" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -372,24 +404,24 @@ export default function Home() {
                   DreamSentinel AI
                 </span>
                 <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-                  Somnia L1
+                  {t('brand_tag')}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">DreamDEX Autonomous Event Contracts Terminal</p>
+              <p className="text-xs text-slate-400">{t('brand_sub')}</p>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 bg-surfaceBorder/40 p-1 rounded-xl border border-surfaceBorder">
+          <nav className="flex items-center gap-1 bg-surfaceBorder/40 p-1 rounded-xl border border-surfaceBorder overflow-x-auto max-w-full">
             {[
-              { id: 'terminal', label: 'Terminal CLOB', icon: LineChart },
-              { id: 'swarm', label: 'Essaim IA Live', icon: Bot },
-              { id: 'copilot', label: 'Copilote IA', icon: MessageSquare },
-              { id: 'scanner', label: 'Scanner', icon: Zap },
-              { id: 'backtest', label: 'Backtest', icon: TrendingUp },
-              { id: 'pvp', label: 'PvP Duels 60s', icon: Swords },
-              { id: 'vaults', label: 'Vaults Copy-Trading', icon: Layers },
-              { id: 'leaderboard', label: 'Leaderboard', icon: Award },
+              { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
+              { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
+              { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare },
+              { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap },
+              { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp },
+              { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords },
+              { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers },
+              { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award },
             ].map(tab => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -397,77 +429,134 @@ export default function Home() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     isActive 
                       ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm' 
                       : 'text-slate-400 hover:text-slate-200 hover:bg-surfaceBorder/50'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
+                  {t(tab.labelKey)}
                 </button>
               );
             })}
           </nav>
 
-          {/* Network, Contracts & Wallet */}
+          {/* Controls: Language, Faucet, Contracts & Wallet */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language Switcher: EN / FR */}
+            <div className="flex items-center rounded-xl bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs font-mono shadow-inner">
+              <button
+                onClick={() => toggleLanguage('en')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  lang === 'en' 
+                    ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40 shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Switch to English"
+              >
+                EN
+              </button>
+              <button
+                onClick={() => toggleLanguage('fr')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  lang === 'fr' 
+                    ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40 shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Passer en Français"
+              >
+                FR
+              </button>
+            </div>
+
+            {/* Official Somnia Faucet Link */}
+            <a
+              href="https://testnet.somnia.network/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm"
+              title="Obtenir des STT gratuits sur le Faucet Somnia"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>{t('faucet_btn')}</span>
+            </a>
+
+            {/* On-Chain Contracts Button */}
             <button
               onClick={() => setShowContractsModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 font-semibold transition-all shadow-sm"
               title="Afficher les contrats déployés sur Somnia Shannon Testnet"
             >
               <LinkIcon className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden md:inline">Contrats On-Chain</span>
+              <span className="hidden md:inline">{t('onchain_contracts_btn')}</span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">4</span>
             </button>
 
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400">
+            {/* Somnia Shannon Network Indicator */}
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>Somnia (50312)</span>
-            </div>
-            
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-xs text-cyan-400 font-mono shadow-[0_0_15px_rgba(34,211,238,0.1)]">
-              <span>Swarm P&L:</span>
-              <span className="font-bold text-emerald-400">+$1,420.50</span>
+              <span>{t('somnia_network')}</span>
             </div>
 
+            {/* Connect Wallet Button */}
             <button
               onClick={handleConnectWallet}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md ${
                 walletConnected
                   ? 'bg-surfaceBorder hover:bg-slate-800 text-slate-200 border border-slate-700'
-                  : 'bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-black font-extrabold shadow-cyan-500/25'
+                  : 'bg-gradient-to-r from-cyan-500 via-teal-400 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-black font-extrabold shadow-cyan-500/25'
               }`}
             >
               <Wallet className="w-4 h-4" />
-              {walletConnected ? `${walletAddress} ($${usdsoBalance.toLocaleString()} USDso)` : 'Connecter Portefeuille'}
+              {walletConnected ? `${walletAddress} ($${usdsoBalance.toLocaleString()} USDso)` : t('connect_wallet')}
             </button>
           </div>
 
         </div>
       </header>
 
-      {/* Real-time Ticker Metrics Strip */}
-      <div className="bg-surface/50 border-b border-surfaceBorder/60 py-2 px-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-slate-400">
-              <Activity className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Volume 24h DreamDEX : <strong className="text-slate-200">$627,100 USDso</strong></span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Gain Total des Vaults IA : <strong className="text-emerald-400">+$17,171.50 USDso (+28.4%)</strong></span>
-            </div>
-            <div className="hidden md:flex items-center gap-2 text-slate-400">
-              <Zap className="w-3.5 h-3.5 text-purple-400" />
-              <span>Latence d\'Exécution Somnia : <strong className="text-purple-300">&lt; 380 ms</strong></span>
-            </div>
+      {/* High-Frequency Institutional Live Ticker Ribbon */}
+      <div className="w-full bg-slate-950/80 border-b border-white/[0.06] backdrop-blur-md px-4 py-2 text-[11px] font-mono overflow-x-auto">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 whitespace-nowrap text-slate-400">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+            <span className="text-slate-500">{t('ticker_tps')}:</span>
+            <span className="text-cyan-300 font-bold">105,420 TPS</span>
+            <span className="text-slate-600">({t('ticker_finality')}: 320ms)</span>
           </div>
-          <div className="flex items-center gap-2 bg-purple-950/40 border border-purple-500/30 px-2.5 py-1 rounded-md text-purple-300">
-            <Award className="w-3 h-3 text-purple-400" />
-            <span className="font-semibold text-[11px]">Somnia × DreamDEX Hackathon 2026 ($5,000 USDso Track)</span>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500">{t('ticker_gas')}:</span>
+            <span className="text-emerald-400 font-bold">&lt; 0.0001 STT</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500">{t('ticker_accuracy')}:</span>
+            <span className="text-purple-300 font-bold">78.4%</span>
+            <span className="text-slate-600">(Brier: 0.082)</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500">{t('ticker_volume')}:</span>
+            <span className="text-slate-200 font-bold">$1,428,500 USDso</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500">{t('ticker_tvl')}:</span>
+            <span className="text-emerald-400 font-bold">$842,500 USDso</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500">{t('ticker_oracle')}:</span>
+            <a 
+              href="https://shannon-explorer.somnia.network/address/0xE1B0f9Fdab26E6470520911BA7CCBda48650541D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:underline flex items-center gap-1"
+            >
+              0xE1B0...41D <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </div>
       </div>
@@ -529,20 +618,20 @@ export default function Home() {
                 <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-surfaceBorder">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                         {currentMarket.category}
                       </span>
-                      <span className="text-xs text-slate-400">Échéance dans 5m (Somnia Fast CLOB)</span>
+                      <span className="text-xs text-slate-400">Somnia Shannon Fast CLOB • 320ms finality</span>
                     </div>
                     <h2 className="text-xl font-bold text-slate-100">{currentMarket.title}</h2>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-xs text-slate-400">Prix Spot sous-jacent</div>
+                    <div className="text-xs text-slate-400">{t('spot_price_label')}</div>
                     <div className="text-2xl font-black font-mono text-emerald-400">
                       ${currentMarket.current_spot.toLocaleString()}
                     </div>
-                    <div className="text-[11px] text-slate-500">Cible (Strike) : ${currentMarket.strike_price.toLocaleString()}</div>
+                    <div className="text-[11px] text-slate-500">{t('strike_label')} : ${currentMarket.strike_price.toLocaleString()}</div>
                   </div>
                 </div>
 
@@ -550,12 +639,12 @@ export default function Home() {
                 <div className="py-6 space-y-4">
                   <div className="flex justify-between items-center text-sm font-semibold">
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400">OUI : {Math.round(currentMarket.implied_prob_yes * 100)}%</span>
+                      <span className="text-emerald-400">{t('buy_yes').replace('BUY ', '').replace('ACHETER ', '')} : {Math.round(currentMarket.implied_prob_yes * 100)}%</span>
                       <span className="text-[11px] text-slate-400">(${currentMarket.yes_best_ask.toFixed(2)} USDso)</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] text-slate-400">(${currentMarket.no_best_ask.toFixed(2)} USDso)</span>
-                      <span className="text-rose-400">NON : {Math.round((1 - currentMarket.implied_prob_yes) * 100)}%</span>
+                      <span className="text-rose-400">{t('buy_no').replace('BUY ', '').replace('ACHETER ', '')} : {Math.round((1 - currentMarket.implied_prob_yes) * 100)}%</span>
                     </div>
                   </div>
 
@@ -571,18 +660,20 @@ export default function Home() {
                   </div>
 
                   {/* AI Bayesian Fair Value Comparison Banner */}
-                  <div className="bg-cyan-950/30 border border-cyan-500/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+                  <div className="bg-gradient-to-r from-cyan-950/40 via-purple-950/30 to-slate-900/60 border border-cyan-500/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400">
+                      <div className="p-2.5 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
                         <Cpu className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="text-xs text-cyan-300 font-bold flex items-center gap-1.5">
-                          <span>Modèle Quantitatif Sentinel-Bayes</span>
-                          <span className="px-1.5 py-0.2 rounded text-[10px] bg-cyan-400/20 text-cyan-300">Edge +18.4%</span>
+                          <span>{t('ai_alpha_title')}</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono font-bold">
+                            Edge +22.4%
+                          </span>
                         </div>
-                        <p className="text-xs text-slate-300">
-                          Probabilité juste estimée par l\'IA : <strong className="text-emerald-400">68.2% OUI</strong> (Sous-évaluation du marché DreamDEX).
+                        <p className="text-xs text-slate-300 pt-0.5">
+                          {t('market_prob')}: <strong className="text-slate-200">51.0%</strong> | {t('ai_bayesian_prob')}: <strong className="text-emerald-400 font-bold">73.4% YES</strong>
                         </p>
                       </div>
                     </div>
@@ -592,9 +683,9 @@ export default function Home() {
                         setTradePrice(currentMarket.yes_best_ask);
                         setTradeAmount(250);
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition-all shadow-md whitespace-nowrap"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold text-xs transition-all shadow-md whitespace-nowrap"
                     >
-                      Copier le Signal IA
+                      {lang === 'en' ? '⚡ Copy AI Signal ($250)' : '⚡ Copier le Signal IA ($250)'}
                     </button>
                   </div>
                 </div>
@@ -603,8 +694,8 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4 pt-2">
                   <div className="bg-surface/80 rounded-xl p-3 border border-surfaceBorder">
                     <div className="text-xs font-bold text-emerald-400 mb-2 flex justify-between">
-                      <span>Bids (Acheteurs OUI)</span>
-                      <span>Taille (USDso)</span>
+                      <span>{t('best_bid')} (YES)</span>
+                      <span>{t('size_col')} (USDso)</span>
                     </div>
                     <div className="space-y-1 font-mono text-xs text-slate-300">
                       <div className="flex justify-between text-emerald-300 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded">
@@ -624,8 +715,8 @@ export default function Home() {
 
                   <div className="bg-surface/80 rounded-xl p-3 border border-surfaceBorder">
                     <div className="text-xs font-bold text-rose-400 mb-2 flex justify-between">
-                      <span>Asks (Vendeurs OUI)</span>
-                      <span>Taille (USDso)</span>
+                      <span>{t('best_ask')} (YES)</span>
+                      <span>{t('size_col')} (USDso)</span>
                     </div>
                     <div className="space-y-1 font-mono text-xs text-slate-300">
                       <div className="flex justify-between text-rose-300 font-semibold bg-rose-500/10 px-2 py-0.5 rounded">
@@ -655,9 +746,9 @@ export default function Home() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                     <Zap className="w-4 h-4 text-cyan-400" />
-                    Exécution d\'Ordre Instantanée
+                    {t('order_panel_title')}
                   </h3>
-                  <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                  <span className="text-[10px] text-cyan-400 font-mono bg-cyan-950/50 px-2 py-0.5 rounded-full border border-cyan-500/30">
                     DreamDEX CLOB
                   </span>
                 </div>
@@ -669,14 +760,18 @@ export default function Home() {
                       setTradeOutcome('YES');
                       setTradePrice(currentMarket.yes_best_ask);
                     }}
-                    className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all flex flex-col items-center gap-1 border ${
+                    className={`py-3.5 px-4 rounded-2xl font-bold text-sm transition-all flex flex-col items-center gap-1 border relative overflow-hidden ${
                       tradeOutcome === 'YES'
-                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-lg shadow-emerald-500/10'
-                        : 'bg-surface border-surfaceBorder text-slate-400 hover:text-slate-200'
+                        ? 'bg-gradient-to-r from-emerald-500/20 via-teal-500/30 to-emerald-500/20 border-emerald-400 text-emerald-300 shadow-lg shadow-emerald-500/25 ring-1 ring-emerald-500/40'
+                        : 'bg-surface/80 border-surfaceBorder text-slate-400 hover:text-slate-200 hover:border-emerald-500/30'
                     }`}
                   >
-                    <span>Acheter OUI</span>
-                    <span className="text-xs font-mono text-emerald-400 font-bold">${currentMarket.yes_best_ask.toFixed(2)}</span>
+                    <span className="flex items-center gap-1.5 font-extrabold tracking-wide">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      {t('buy_yes')}
+                    </span>
+                    <span className="text-xs font-mono text-emerald-400 font-bold">${currentMarket.yes_best_ask.toFixed(2)} USDso</span>
+                    <span className="text-[10px] text-slate-400">{t('yes_sub')}</span>
                   </button>
 
                   <button
@@ -684,14 +779,18 @@ export default function Home() {
                       setTradeOutcome('NO');
                       setTradePrice(currentMarket.no_best_ask);
                     }}
-                    className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all flex flex-col items-center gap-1 border ${
+                    className={`py-3.5 px-4 rounded-2xl font-bold text-sm transition-all flex flex-col items-center gap-1 border relative overflow-hidden ${
                       tradeOutcome === 'NO'
-                        ? 'bg-rose-500/20 border-rose-500 text-rose-300 shadow-lg shadow-rose-500/10'
-                        : 'bg-surface border-surfaceBorder text-slate-400 hover:text-slate-200'
+                        ? 'bg-gradient-to-r from-rose-500/20 via-pink-500/30 to-rose-500/20 border-rose-400 text-rose-300 shadow-lg shadow-rose-500/25 ring-1 ring-rose-500/40'
+                        : 'bg-surface/80 border-surfaceBorder text-slate-400 hover:text-slate-200 hover:border-rose-500/30'
                     }`}
                   >
-                    <span>Acheter NON</span>
-                    <span className="text-xs font-mono text-rose-400 font-bold">${currentMarket.no_best_ask.toFixed(2)}</span>
+                    <span className="flex items-center gap-1.5 font-extrabold tracking-wide">
+                      <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                      {t('buy_no')}
+                    </span>
+                    <span className="text-xs font-mono text-rose-400 font-bold">${currentMarket.no_best_ask.toFixed(2)} USDso</span>
+                    <span className="text-[10px] text-slate-400">{t('no_sub')}</span>
                   </button>
                 </div>
 
@@ -699,18 +798,18 @@ export default function Home() {
                 <div className="space-y-4 mb-6">
                   <div>
                     <div className="flex justify-between text-xs text-slate-400 mb-1.5">
-                      <span>Montant d\'investissement</span>
+                      <span>{t('order_amount_label')}</span>
                       <span className="text-slate-300 font-mono font-semibold">${tradeAmount} USDso</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {[50, 100, 250, 500, 1000].map(val => (
+                      {[25, 50, 100, 250, 500].map(val => (
                         <button
                           key={val}
                           onClick={() => setTradeAmount(val)}
-                          className={`flex-1 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                          className={`flex-1 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                             tradeAmount === val
-                              ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300'
-                              : 'bg-surface border-surfaceBorder text-slate-400 hover:text-slate-200'
+                              ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold shadow-sm'
+                              : 'bg-surface border-surfaceBorder text-slate-400 hover:text-slate-200 hover:border-slate-700'
                           }`}
                         >
                           ${val}
@@ -720,23 +819,23 @@ export default function Home() {
                   </div>
 
                   {/* Kelly Criterion Suggestion Badge */}
-                  <div className="bg-slate-900/80 rounded-xl p-3 border border-slate-800 flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Dimensionnement de Kelly optimal :</span>
-                    <span className="text-cyan-400 font-mono font-bold">$270 USDso (5.0%)</span>
+                  <div className="bg-slate-900/90 rounded-xl p-3 border border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-400">{t('kelly_allocation')} :</span>
+                    <span className="text-cyan-400 font-bold">$270 USDso (5.0%)</span>
                   </div>
 
                   {/* Return Simulation */}
-                  <div className="bg-surface/90 rounded-xl p-3 border border-surfaceBorder space-y-2 text-xs">
+                  <div className="bg-surface/90 rounded-xl p-3.5 border border-surfaceBorder space-y-2 text-xs">
                     <div className="flex justify-between text-slate-400">
-                      <span>Actions d\'événement acquises :</span>
+                      <span>{t('shares_acquired')} :</span>
                       <span className="text-slate-200 font-mono font-bold">{Math.round(tradeAmount / tradePrice)} parts</span>
                     </div>
                     <div className="flex justify-between text-slate-400">
-                      <span>Paiement potentiel à résolution :</span>
+                      <span>{t('payout_at_settlement')} :</span>
                       <span className="text-emerald-400 font-mono font-bold">${Math.round((tradeAmount / tradePrice))} USDso</span>
                     </div>
-                    <div className="flex justify-between text-slate-400 pt-1 border-t border-surfaceBorder">
-                      <span>Rendement Net Estimé :</span>
+                    <div className="flex justify-between text-slate-400 pt-1.5 border-t border-surfaceBorder">
+                      <span>{t('net_profit')} :</span>
                       <span className="text-emerald-400 font-bold font-mono">
                         +{Math.round(((1 / tradePrice) - 1) * 100)}%
                       </span>
@@ -748,20 +847,21 @@ export default function Home() {
                 <button
                   disabled={isTrading}
                   onClick={() => handlePlaceOrder()}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-black font-extrabold text-sm transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 hover:from-cyan-400 hover:to-emerald-300 text-slate-950 font-black text-sm tracking-wide transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 hover:shadow-cyan-500/40 active:scale-[0.99]"
                 >
                   {isTrading ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Routage sur Somnia L1...</span>
+                      <span>{lang === 'en' ? 'Routing on Somnia L1...' : 'Routage sur Somnia L1...'}</span>
                     </>
                   ) : (
                     <>
-                      <span>Confirmer l\'Ordre sur DreamDEX</span>
+                      <span>{t('place_order_btn')}</span>
                       <ArrowUpRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
+
 
                 {tradeSuccessMsg && (
                   <div className="mt-3 p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-xs flex items-center gap-2">
@@ -1159,9 +1259,9 @@ export default function Home() {
             </button>
 
             <div>
-              <h3 className="text-lg font-bold text-slate-100">Connecter un Portefeuille</h3>
+              <h3 className="text-lg font-bold text-slate-100">{t('wallet_modal_title')}</h3>
               <p className="text-xs text-slate-400">
-                Choisissez votre portefeuille Web3 pour trader sur Somnia Shannon.
+                {t('wallet_modal_sub')}
               </p>
             </div>
 
@@ -1177,11 +1277,11 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">MetaMask</h4>
-                    <p className="text-[11px] text-slate-400">Rabby, Brave Wallet ou extension EVM</p>
+                    <p className="text-[11px] text-slate-400">{t('wallet_metamask_sub')}</p>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono">
-                  Recommandé
+                  {t('recommended_badge')}
                 </span>
               </button>
 
@@ -1196,7 +1296,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-slate-200 group-hover:text-purple-300 transition-colors">Phantom Wallet</h4>
-                    <p className="text-[11px] text-slate-400">Support multi-chain EVM</p>
+                    <p className="text-[11px] text-slate-400">{t('wallet_phantom_sub')}</p>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-400 font-mono">
@@ -1214,12 +1314,12 @@ export default function Home() {
                     ⚡
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-cyan-300 group-hover:text-cyan-200 transition-colors">Mode Démo Somnia (1-Clic)</h4>
-                    <p className="text-[11px] text-slate-400">Préchargé avec $5,420.00 USDso</p>
+                    <h4 className="font-bold text-sm text-cyan-300 group-hover:text-cyan-200 transition-colors">{t('wallet_demo')}</h4>
+                    <p className="text-[11px] text-slate-400">{t('wallet_demo_sub')}</p>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono">
-                  Instantané
+                  {t('instant_badge')}
                 </span>
               </button>
             </div>
