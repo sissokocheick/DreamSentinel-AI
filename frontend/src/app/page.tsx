@@ -79,60 +79,101 @@ export default function Home() {
   const [vaultUserBalance, setVaultUserBalance] = useState<number>(1250.00);
 
   // Modals
+  const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
   const [showContractsModal, setShowContractsModal] = useState<boolean>(false);
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
-  // Connect Wallet (MetaMask / EIP-1193 or Fallback Demo)
-  const handleConnectWallet = async () => {
+  // Connect Wallet: open selector or disconnect
+  const handleConnectWallet = () => {
     if (walletConnected) {
       setWalletConnected(false);
       toast.info('Portefeuille déconnecté');
       return;
     }
+    setShowWalletModal(true);
+  };
 
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
-      try {
-        const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts && accounts.length > 0) {
-          const acc = accounts[0];
-          setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
-          setWalletConnected(true);
-          toast.success('Portefeuille connecté via Web3 !', {
-            description: `Connecté à ${acc.slice(0, 8)}... sur Somnia`,
-          });
-          try {
-            await (window as any).ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0xc488' }], // 50312 in hex
+  // Connect via specific provider (MetaMask, Phantom, or Demo)
+  const connectWithProvider = async (walletType: 'metamask' | 'phantom' | 'demo') => {
+    setShowWalletModal(false);
+
+    if (walletType === 'demo') {
+      setWalletAddress('0x71C...B829');
+      setWalletConnected(true);
+      toast.success('Portefeuille Somnia Connecté (Mode Démo)', {
+        description: 'Solde actif : $5,420.00 USDso',
+      });
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      let provider: any = null;
+      const eth = (window as any).ethereum;
+
+      if (walletType === 'phantom') {
+        provider = (window as any).phantom?.ethereum || (eth?.providers?.find((p: any) => p.isPhantom)) || (eth?.isPhantom ? eth : null);
+      } else if (walletType === 'metamask') {
+        if (eth?.providers?.length) {
+          provider = eth.providers.find((p: any) => p.isMetaMask && !p.isPhantom) || eth.providers.find((p: any) => p.isMetaMask);
+        } else if (eth && !eth.isPhantom) {
+          provider = eth;
+        } else {
+          provider = eth;
+        }
+      }
+
+      if (provider) {
+        try {
+          const accounts = await provider.request({ method: 'eth_requestAccounts' });
+          if (accounts && accounts.length > 0) {
+            const acc = accounts[0];
+            setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
+            setWalletConnected(true);
+            const walletLabel = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
+            toast.success(`Portefeuille connecté via ${walletLabel} !`, {
+              description: `Connecté à ${acc.slice(0, 8)}... sur Somnia`,
             });
-          } catch (switchError: any) {
-            if (switchError.code === 4902) {
-              await (window as any).ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                  chainId: '0xc488',
-                  chainName: 'Somnia Shannon Testnet',
-                  nativeCurrency: { name: 'STT', symbol: 'STT', decimals: 18 },
-                  rpcUrls: ['https://dream-rpc.somnia.network'],
-                  blockExplorerUrls: ['https://shannon-explorer.somnia.network/']
-                }]
+            try {
+              await provider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0xc488' }], // 50312 in hex
               });
+            } catch (switchError: any) {
+              if (switchError.code === 4902) {
+                await provider.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0xc488',
+                    chainName: 'Somnia Shannon Testnet',
+                    nativeCurrency: { name: 'STT', symbol: 'STT', decimals: 18 },
+                    rpcUrls: ['https://dream-rpc.somnia.network'],
+                    blockExplorerUrls: ['https://shannon-explorer.somnia.network/']
+                  }]
+                });
+              }
             }
+            return;
           }
+        } catch (err: any) {
+          toast.error(`Connexion annulée ou rejetée`, {
+            description: err?.message || 'Vérifiez la signature dans votre portefeuille',
+          });
           return;
         }
-      } catch (err) {
-        console.warn('MetaMask connection fallback to Demo Wallet', err);
+      } else {
+        const walletLabel = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
+        toast.error(`Extension ${walletLabel} introuvable`, {
+          description: `Veuillez activer ${walletLabel} ou utiliser le mode Démo.`,
+        });
+        return;
       }
     }
+
     // Fallback demo connection
     setWalletAddress('0x71C...B829');
     setWalletConnected(true);
-    toast.success('Portefeuille Somnia Connecté (Mode Démo)', {
-      description: 'Solde actif : $5,420.00 USDso',
-    });
   };
 
   // Confirm Deposit into Vault
@@ -1062,6 +1103,90 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* MODAL 0: MULTI-WALLET SELECTOR */}
+      {showWalletModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="max-w-md w-full bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 shadow-2xl space-y-5 text-slate-100 relative">
+            <button
+              onClick={() => setShowWalletModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <h3 className="text-lg font-bold text-slate-100">Connecter un Portefeuille</h3>
+              <p className="text-xs text-slate-400">
+                Choisissez votre portefeuille Web3 pour trader sur Somnia Shannon.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {/* Option 1: MetaMask / EVM */}
+              <button
+                onClick={() => connectWithProvider('metamask')}
+                className="w-full p-4 rounded-2xl bg-surface/80 hover:bg-cyan-500/10 border border-surfaceBorder hover:border-cyan-500/50 flex items-center justify-between transition-all group text-left"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">
+                    🦊
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">MetaMask</h4>
+                    <p className="text-[11px] text-slate-400">Rabby, Brave Wallet ou extension EVM</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono">
+                  Recommandé
+                </span>
+              </button>
+
+              {/* Option 2: Phantom */}
+              <button
+                onClick={() => connectWithProvider('phantom')}
+                className="w-full p-4 rounded-2xl bg-surface/80 hover:bg-purple-500/10 border border-surfaceBorder hover:border-purple-500/50 flex items-center justify-between transition-all group text-left"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl">
+                    👻
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-purple-300 transition-colors">Phantom Wallet</h4>
+                    <p className="text-[11px] text-slate-400">Support multi-chain EVM</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-400 font-mono">
+                  EVM
+                </span>
+              </button>
+
+              {/* Option 3: Somnia Demo */}
+              <button
+                onClick={() => connectWithProvider('demo')}
+                className="w-full p-4 rounded-2xl bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-cyan-500/30 hover:border-cyan-400 flex items-center justify-between transition-all group text-left shadow-sm"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xl">
+                    ⚡
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-cyan-300 group-hover:text-cyan-200 transition-colors">Mode Démo Somnia (1-Clic)</h4>
+                    <p className="text-[11px] text-slate-400">Préchargé avec $5,420.00 USDso</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono">
+                  Instantané
+                </span>
+              </button>
+            </div>
+
+            <p className="text-[11px] text-slate-500 text-center pt-1">
+              Réseau : Somnia Shannon Testnet • Chain ID 50312
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* MODAL 1: SOMNIA ON-CHAIN CONTRACTS VERIFICATION */}
       {showContractsModal && (
