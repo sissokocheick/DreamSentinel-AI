@@ -13,7 +13,7 @@
     "framer-motion": "^11.0.8",
     "lightweight-charts": "^5.2.1",
     "lucide-react": "^0.354.0",
-    "next": "^15.3.4",
+    "next": "^15.5.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sonner": "^2.0.8",
