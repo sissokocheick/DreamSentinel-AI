@@ -335,7 +335,7 @@ export default function Home() {
             >
               <LinkIcon className="w-3.5 h-3.5 text-cyan-400" />
               <span className="hidden md:inline">Contrats On-Chain</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">3</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">4</span>
             </button>
 
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400">
@@ -1088,6 +1088,11 @@ export default function Home() {
 
             <div className="space-y-3 font-mono text-xs">
               {[
+                {
+                  name: 'DreamSentinelOracle.sol',
+                  role: 'Oracle & Registre de Signaux IA On-Chain',
+                  address: '0xE1B0f9Fdab26E6470520911BA7CCBda48650541D',
+                },
                 {
                   name: 'DreamSentinelVault.sol',
                   role: 'Vault Décentralisé ERC-4626 (dsALPHA)',

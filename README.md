@@ -66,10 +66,12 @@ npm run dev
 
 ---
 
-## 📜 Deployed Contracts (Somnia Testnet)
-- **Mock USDso**: `0xc3260e68Cd634Ba9A7f0BA125e4640ccd916F1AE`
-- **DreamSentinelVault**: `0x7F4EA982ef392D1e7F46798fE7618e31F1bE689a`
-- **PvPDuelEscrow**: `0x773D7953a12F070618C8f7061435a9C020dA6F2A`
+## 📜 Deployed Contracts (Somnia Shannon Testnet - ChainID 50312)
+- **DreamSentinelOracle** (Verifiable AI Oracle & Prediction Anchor): [`0xE1B0f9Fdab26E6470520911BA7CCBda48650541D`](https://shannon-explorer.somnia.network/address/0xE1B0f9Fdab26E6470520911BA7CCBda48650541D)
+- **DreamSentinelVault** (ERC-4626 Multi-Strategy Copy-Trading): [`0x7F4EA982ef392D1e7F46798fE7618e31F1bE689a`](https://shannon-explorer.somnia.network/address/0x7F4EA982ef392D1e7F46798fE7618e31F1bE689a)
+- **PvPDuelEscrow** (60s Micro-Prediction Duels Escrow): [`0x773D7953a12F070618C8f7061435a9C020dA6F2A`](https://shannon-explorer.somnia.network/address/0x773D7953a12F070618C8f7061435a9C020dA6F2A)
+- **Mock USDso Token** (Collateral Asset): [`0xc3260e68Cd634Ba9A7f0BA125e4640ccd916F1AE`](https://shannon-explorer.somnia.network/address/0xc3260e68Cd634Ba9A7f0BA125e4640ccd916F1AE)
+- **Deployer Wallet**: [`0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43`](https://shannon-explorer.somnia.network/address/0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43)
 
 ---
 
