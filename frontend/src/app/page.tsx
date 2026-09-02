@@ -90,6 +90,7 @@ export default function Home() {
 
   // Navigation
   const [activeTab, setActiveTab] = useState<'terminal' | 'swarm' | 'copilot' | 'scanner' | 'backtest' | 'pvp' | 'vaults' | 'leaderboard'>('terminal');
+  const [terminalSubTab, setTerminalSubTab] = useState<'orderbook' | 'ai_alpha' | 'trades' | 'positions'>('orderbook');
   
   // Data states
   const [markets, setMarkets] = useState<Market[]>(getFallbackMarkets());
@@ -568,173 +569,294 @@ export default function Home() {
         {activeTab === 'terminal' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            {/* Left Col: Market List & Active Event View */}
-            <div className="lg:col-span-8 space-y-6">
+            {/* Left Col: Market Header, Chart & Unified Data Tabs */}
+            <div className="lg:col-span-8 space-y-5">
               
-              {/* Fast Market Switcher Carousel */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {markets.map(m => {
-                  const isSelected = m.market_id === selectedMarketId;
-                  const probPct = Math.round(m.implied_prob_yes * 100);
-                  return (
-                    <button
-                      key={m.market_id}
-                      onClick={() => {
-                        setSelectedMarketId(m.market_id);
-                        setTradePrice(m.yes_best_ask);
-                      }}
-                      className={`p-3 rounded-2xl text-left transition-all border ${
-                        isSelected
-                          ? 'bg-surfaceBorder/80 border-cyan-500 shadow-lg shadow-cyan-500/10'
-                          : 'bg-surface/60 border-surfaceBorder hover:border-slate-700 hover:bg-surface/90'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold text-slate-300">{m.symbol}</span>
-                        <span className="text-[10px] text-cyan-400 font-medium">{probPct}% OUI</span>
-                      </div>
-                      <div className="text-xs text-slate-400 truncate mb-2">{m.title}</div>
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="text-slate-500">Vol: ${Math.round(m.volume_24h / 1000)}k</span>
-                        <span className="text-emerald-400 font-mono">${m.current_spot.toLocaleString()}</span>
-                      </div>
-                    </button>
-                  );
-                })}
+              {/* 1. Market Selection & Key Metrics Bar (Polymarket / Hyperliquid style) */}
+              <div className="glass-panel rounded-2xl p-4 sm:p-5 relative overflow-hidden border border-white/[0.08]">
+                {/* Quick Switcher Pills */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-3 border-b border-white/[0.06] text-xs">
+                  <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider hidden sm:inline">Markets:</span>
+                  {markets.map(m => {
+                    const isSelected = m.market_id === selectedMarketId;
+                    const probPct = Math.round(m.implied_prob_yes * 100);
+                    return (
+                      <button
+                        key={m.market_id}
+                        onClick={() => {
+                          setSelectedMarketId(m.market_id);
+                          setTradePrice(m.yes_best_ask);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl font-mono text-xs whitespace-nowrap flex items-center gap-2 transition-all border ${
+                          isSelected
+                            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-sm'
+                            : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
+                        }`}
+                      >
+                        <span className="font-bold">{m.symbol}</span>
+                        <span className="text-[11px] text-emerald-400 font-semibold">{probPct}% YES</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Active Market Title & Live Stats Bar */}
+                <div className="pt-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        {currentMarket.category}
+                      </span>
+                      <span className="text-xs text-slate-400 font-mono">
+                        ⏱️ Expiry in 5m • Somnia Fast CLOB
+                      </span>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-100">{currentMarket.title}</h2>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono">
+                    <div className="bg-slate-900/80 px-3 py-2 rounded-xl border border-white/[0.06]">
+                      <div className="text-[10px] text-slate-500 uppercase">{t('spot_price_label')}</div>
+                      <div className="text-base font-bold text-emerald-400">${currentMarket.current_spot.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-slate-900/80 px-3 py-2 rounded-xl border border-white/[0.06]">
+                      <div className="text-[10px] text-slate-500 uppercase">{t('strike_label')}</div>
+                      <div className="text-base font-bold text-slate-200">${currentMarket.strike_price.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-slate-900/80 px-3 py-2 rounded-xl border border-white/[0.06] hidden sm:block">
+                      <div className="text-[10px] text-slate-500 uppercase">{t('volume_label')}</div>
+                      <div className="text-base font-bold text-cyan-300">${Math.round(currentMarket.volume_24h / 1000)}k</div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* ===== INTERACTIVE CHARTS PANEL ===== */}
-              <div style={{ height: '380px' }} className="w-full">
+              {/* 2. Interactive Charts Panel */}
+              <div style={{ height: '390px' }} className="w-full">
                 <MarketChartsPanel
                   market={currentMarket}
                   aiProbability={0.682}
                 />
               </div>
 
-              {/* Active Market Showcase Box */}
-              <div className="glass-panel rounded-3xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-                
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-surfaceBorder">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                        {currentMarket.category}
-                      </span>
-                      <span className="text-xs text-slate-400">Somnia Shannon Fast CLOB • 320ms finality</span>
-                    </div>
-                    <h2 className="text-xl font-bold text-slate-100">{currentMarket.title}</h2>
+              {/* 3. Unified Tabbed Data Widget (Orderbook, AI Alpha, Trades, Positions) */}
+              <div className="glass-panel rounded-2xl border border-white/[0.08] overflow-hidden">
+                {/* Sub-Tabs Header */}
+                <div className="flex items-center justify-between px-4 pt-3 border-b border-white/[0.06] bg-slate-950/40">
+                  <div className="flex items-center gap-1">
+                    {[
+                      { id: 'orderbook', label: lang === 'en' ? 'CLOB Orderbook' : 'Carnet CLOB', icon: LineChart },
+                      { id: 'ai_alpha', label: lang === 'en' ? 'Bayesian AI Alpha' : 'Alpha Bayésien IA', icon: Cpu },
+                      { id: 'trades', label: lang === 'en' ? 'Live Trades' : 'Transactions Récentes', icon: Activity },
+                      { id: 'positions', label: lang === 'en' ? 'My Positions (2)' : 'Mes Positions (2)', icon: Layers },
+                    ].map(st => {
+                      const Icon = st.icon;
+                      const isSubActive = terminalSubTab === st.id;
+                      return (
+                        <button
+                          key={st.id}
+                          onClick={() => setTerminalSubTab(st.id as any)}
+                          className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all ${
+                            isSubActive
+                              ? 'border-cyan-400 text-cyan-300 bg-cyan-500/10'
+                              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]'
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          <span>{st.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-
-                  <div className="text-right">
-                    <div className="text-xs text-slate-400">{t('spot_price_label')}</div>
-                    <div className="text-2xl font-black font-mono text-emerald-400">
-                      ${currentMarket.current_spot.toLocaleString()}
-                    </div>
-                    <div className="text-[11px] text-slate-500">{t('strike_label')} : ${currentMarket.strike_price.toLocaleString()}</div>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 hidden sm:inline">
+                    Somnia Shannon L1 • 0xCLOB
+                  </span>
                 </div>
 
-                {/* Probability & Bayesian Edge Bar */}
-                <div className="py-6 space-y-4">
-                  <div className="flex justify-between items-center text-sm font-semibold">
-                    <div className="flex items-center gap-2">
-                      <span className="text-emerald-400">{t('buy_yes').replace('BUY ', '').replace('ACHETER ', '')} : {Math.round(currentMarket.implied_prob_yes * 100)}%</span>
-                      <span className="text-[11px] text-slate-400">(${currentMarket.yes_best_ask.toFixed(2)} USDso)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-slate-400">(${currentMarket.no_best_ask.toFixed(2)} USDso)</span>
-                      <span className="text-rose-400">{t('buy_no').replace('BUY ', '').replace('ACHETER ', '')} : {Math.round((1 - currentMarket.implied_prob_yes) * 100)}%</span>
-                    </div>
-                  </div>
+                {/* Sub-Tab Content */}
+                <div className="p-4 sm:p-5">
+                  {/* SUB-TAB A: CLOB ORDERBOOK */}
+                  {terminalSubTab === 'orderbook' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Bids */}
+                        <div className="space-y-2">
+                          <div className="text-xs font-bold text-emerald-400 flex justify-between font-mono pb-1 border-b border-white/[0.06]">
+                            <span>{t('best_bid')} (YES)</span>
+                            <span>{t('size_col')}</span>
+                            <span>Total (USDso)</span>
+                          </div>
+                          <div className="space-y-1 font-mono text-xs">
+                            {[
+                              { price: 0.48, size: '25,800', total: '12,384', depth: 85 },
+                              { price: 0.47, size: '18,500', total: '8,695', depth: 62 },
+                              { price: 0.45, size: '54,000', total: '24,300', depth: 95 },
+                              { price: 0.44, size: '12,000', total: '5,280', depth: 40 },
+                            ].map((row, idx) => (
+                              <div key={idx} className="relative flex justify-between px-2.5 py-1 rounded overflow-hidden">
+                                <div
+                                  style={{ width: `${row.depth}%` }}
+                                  className="absolute top-0 right-0 bottom-0 bg-emerald-500/10 -z-0 pointer-events-none rounded"
+                                />
+                                <span className="text-emerald-400 font-bold z-10">${row.price.toFixed(2)}</span>
+                                <span className="text-slate-300 z-10">{row.size}</span>
+                                <span className="text-slate-400 z-10">${row.total}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-                  <div className="w-full h-4 bg-slate-900 rounded-full overflow-hidden p-0.5 flex">
-                    <div
-                      style={{ width: `${currentMarket.implied_prob_yes * 100}%` }}
-                      className="bg-gradient-to-r from-emerald-500 to-teal-400 rounded-l-full transition-all duration-500"
-                    />
-                    <div
-                      style={{ width: `${(1 - currentMarket.implied_prob_yes) * 100}%` }}
-                      className="bg-gradient-to-r from-rose-500 to-red-600 rounded-r-full transition-all duration-500"
-                    />
-                  </div>
-
-                  {/* AI Bayesian Fair Value Comparison Banner */}
-                  <div className="bg-gradient-to-r from-cyan-950/40 via-purple-950/30 to-slate-900/60 border border-cyan-500/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                        <Cpu className="w-5 h-5" />
+                        {/* Asks */}
+                        <div className="space-y-2">
+                          <div className="text-xs font-bold text-rose-400 flex justify-between font-mono pb-1 border-b border-white/[0.06]">
+                            <span>{t('best_ask')} (YES)</span>
+                            <span>{t('size_col')}</span>
+                            <span>Total (USDso)</span>
+                          </div>
+                          <div className="space-y-1 font-mono text-xs">
+                            {[
+                              { price: 0.51, size: '29,800', total: '15,198', depth: 75 },
+                              { price: 0.52, size: '12,400', total: '6,448', depth: 45 },
+                              { price: 0.54, size: '58,300', total: '31,482', depth: 90 },
+                              { price: 0.55, size: '16,200', total: '8,910', depth: 55 },
+                            ].map((row, idx) => (
+                              <div key={idx} className="relative flex justify-between px-2.5 py-1 rounded overflow-hidden">
+                                <div
+                                  style={{ width: `${row.depth}%` }}
+                                  className="absolute top-0 left-0 bottom-0 bg-rose-500/10 -z-0 pointer-events-none rounded"
+                                />
+                                <span className="text-rose-400 font-bold z-10">${row.price.toFixed(2)}</span>
+                                <span className="text-slate-300 z-10">{row.size}</span>
+                                <span className="text-slate-400 z-10">${row.total}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-xs text-cyan-300 font-bold flex items-center gap-1.5">
-                          <span>{t('ai_alpha_title')}</span>
-                          <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono font-bold">
-                            Edge +22.4%
+
+                      {/* Spread Indicator Bar */}
+                      <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>{t('spread')}: <strong className="text-cyan-300">$0.03 (5.8%)</strong></span>
+                        <span className="text-slate-500">Matching Engine: Somnia L1 Sub-second Reactive</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUB-TAB B: BAYESIAN AI ALPHA GAUGE */}
+                  {terminalSubTab === 'ai_alpha' && (
+                    <div className="space-y-5">
+                      {/* Comparison Gauge */}
+                      <div className="bg-slate-900/80 rounded-2xl p-4 border border-cyan-500/30 space-y-4">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400"><Cpu className="w-4 h-4" /></span>
+                            <span className="font-bold text-sm text-slate-100">{t('ai_alpha_title')}</span>
+                          </div>
+                          <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold">
+                            Edge +22.4% (STRONG BUY YES)
                           </span>
                         </div>
-                        <p className="text-xs text-slate-300 pt-0.5">
-                          {t('market_prob')}: <strong className="text-slate-200">51.0%</strong> | {t('ai_bayesian_prob')}: <strong className="text-emerald-400 font-bold">73.4% YES</strong>
-                        </p>
+
+                        {/* Visual Comparison Bar */}
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-xs font-mono text-slate-400">
+                            <span>Market Odds: <strong className="text-slate-200">51.0% ($0.51)</strong></span>
+                            <span>AI Forecast: <strong className="text-emerald-400 font-bold">73.4% ($0.73)</strong></span>
+                          </div>
+                          <div className="w-full h-3 bg-slate-950 rounded-full overflow-hidden p-0.5 flex">
+                            <div style={{ width: '51%' }} className="bg-slate-500 h-full rounded-l-full" title="Market Price" />
+                            <div style={{ width: '22.4%' }} className="bg-emerald-400 h-full animate-pulse" title="Alpha Edge" />
+                            <div style={{ width: '26.6%' }} className="bg-slate-800 h-full rounded-r-full" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 font-mono text-xs text-center">
+                          <div className="p-2.5 rounded-xl bg-slate-950/60 border border-white/[0.06]">
+                            <div className="text-[10px] text-slate-500">Kelly Sizing</div>
+                            <div className="font-bold text-cyan-400">$270 USDso (5.0%)</div>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-slate-950/60 border border-white/[0.06]">
+                            <div className="text-[10px] text-slate-500">{t('brier_score_label')}</div>
+                            <div className="font-bold text-purple-300">0.082 (Top 1%)</div>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-slate-950/60 border border-white/[0.06]">
+                            <div className="text-[10px] text-slate-500">Expected Value (EV)</div>
+                            <div className="font-bold text-emerald-400">+43.9%</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400">Model: Bayesian Sequential Quant Engine • Verified on Somnia Oracle</span>
+                        <button
+                          onClick={() => {
+                            setTradeOutcome('YES');
+                            setTradePrice(currentMarket.yes_best_ask);
+                            setTradeAmount(250);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-bold transition-all shadow-sm"
+                        >
+                          {lang === 'en' ? '⚡ Copy Signal to Ticket' : '⚡ Copier le Signal dans l\'Ordre'}
+                        </button>
                       </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        setTradeOutcome('YES');
-                        setTradePrice(currentMarket.yes_best_ask);
-                        setTradeAmount(250);
-                      }}
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold text-xs transition-all shadow-md whitespace-nowrap"
-                    >
-                      {lang === 'en' ? '⚡ Copy AI Signal ($250)' : '⚡ Copier le Signal IA ($250)'}
-                    </button>
-                  </div>
+                  )}
+
+                  {/* SUB-TAB C: LIVE TRADES */}
+                  {terminalSubTab === 'trades' && (
+                    <div className="space-y-2 font-mono text-xs">
+                      <div className="flex justify-between text-slate-500 pb-1 border-b border-white/[0.06] text-[11px]">
+                        <span>Time</span>
+                        <span>Side</span>
+                        <span>Price</span>
+                        <span>Amount</span>
+                        <span>Tx Hash</span>
+                      </div>
+                      {[
+                        { time: '23:10:45', side: 'BUY YES', price: '$0.51', amount: '$450 USDso', hash: '0x3a8...c912', sideColor: 'text-emerald-400' },
+                        { time: '23:10:41', side: 'BUY YES', price: '$0.50', amount: '$1,200 USDso', hash: '0x7e1...f044', sideColor: 'text-emerald-400' },
+                        { time: '23:10:33', side: 'BUY NO', price: '$0.49', amount: '$250 USDso', hash: '0x1b2...99a0', sideColor: 'text-rose-400' },
+                        { time: '23:10:19', side: 'BUY YES', price: '$0.51', amount: '$750 USDso', hash: '0xd44...7188', sideColor: 'text-emerald-400' },
+                        { time: '23:10:02', side: 'BUY YES', price: '$0.50', amount: '$300 USDso', hash: '0xfa9...2310', sideColor: 'text-emerald-400' },
+                      ].map((tr, idx) => (
+                        <div key={idx} className="flex justify-between items-center py-1 border-b border-white/[0.02] hover:bg-white/[0.02] px-1 rounded">
+                          <span className="text-slate-400">{tr.time}</span>
+                          <span className={`font-bold ${tr.sideColor}`}>{tr.side}</span>
+                          <span className="text-slate-200">{tr.price}</span>
+                          <span className="text-slate-300">{tr.amount}</span>
+                          <span className="text-cyan-400/80">{tr.hash}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* SUB-TAB D: MY POSITIONS */}
+                  {terminalSubTab === 'positions' && (
+                    <div className="space-y-3 font-mono text-xs">
+                      <div className="flex justify-between text-slate-500 pb-1 border-b border-white/[0.06] text-[11px]">
+                        <span>Market</span>
+                        <span>Outcome</span>
+                        <span>Shares</span>
+                        <span>Entry Price</span>
+                        <span>Mark Price</span>
+                        <span>Unrealized P&L</span>
+                      </div>
+                      {[
+                        { market: 'BTC-USD-5M', outcome: 'YES', shares: '196', entry: '$0.51', mark: '$0.51', pnl: '+$0.00', pnlColor: 'text-slate-300' },
+                        { market: 'SOMNIA-TPS', outcome: 'YES', shares: '350', entry: '$0.78', mark: '$0.82', pnl: '+$14.00 (+5.1%)', pnlColor: 'text-emerald-400' },
+                      ].map((pos, idx) => (
+                        <div key={idx} className="flex justify-between items-center py-2 border-b border-white/[0.04] px-1 rounded bg-slate-900/40">
+                          <span className="font-bold text-slate-200">{pos.market}</span>
+                          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">{pos.outcome}</span>
+                          <span className="text-slate-300">{pos.shares} parts</span>
+                          <span className="text-slate-400">{pos.entry}</span>
+                          <span className="text-slate-200 font-bold">{pos.mark}</span>
+                          <span className={`font-bold ${pos.pnlColor}`}>{pos.pnl}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-
-                {/* Simulated CLOB Order Book Tape */}
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="bg-surface/80 rounded-xl p-3 border border-surfaceBorder">
-                    <div className="text-xs font-bold text-emerald-400 mb-2 flex justify-between">
-                      <span>{t('best_bid')} (YES)</span>
-                      <span>{t('size_col')} (USDso)</span>
-                    </div>
-                    <div className="space-y-1 font-mono text-xs text-slate-300">
-                      <div className="flex justify-between text-emerald-300 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded">
-                        <span>$0.48</span>
-                        <span>$12,400</span>
-                      </div>
-                      <div className="flex justify-between px-2 py-0.5">
-                        <span>$0.47</span>
-                        <span>$8,900</span>
-                      </div>
-                      <div className="flex justify-between px-2 py-0.5">
-                        <span>$0.45</span>
-                        <span>$24,000</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-surface/80 rounded-xl p-3 border border-surfaceBorder">
-                    <div className="text-xs font-bold text-rose-400 mb-2 flex justify-between">
-                      <span>{t('best_ask')} (YES)</span>
-                      <span>{t('size_col')} (USDso)</span>
-                    </div>
-                    <div className="space-y-1 font-mono text-xs text-slate-300">
-                      <div className="flex justify-between text-rose-300 font-semibold bg-rose-500/10 px-2 py-0.5 rounded">
-                        <span>$0.51</span>
-                        <span>$15,200</span>
-                      </div>
-                      <div className="flex justify-between px-2 py-0.5">
-                        <span>$0.52</span>
-                        <span>$6,400</span>
-                      </div>
-                      <div className="flex justify-between px-2 py-0.5">
-                        <span>$0.54</span>
-                        <span>$31,500</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
             </div>
