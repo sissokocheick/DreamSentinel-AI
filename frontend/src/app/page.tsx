@@ -106,22 +106,23 @@ export default function Home() {
 
   // Wallet
   const [walletConnected, setWalletConnected] = useState<boolean>(false);
-  const [walletAddress, setWalletAddress] = useState<string>('0x71C...B829');
+  const [walletAddress, setWalletAddress] = useState<string>('0x4eE...cC43');
+  const [walletAddressFull, setWalletAddressFull] = useState<string>('0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43');
   const [usdsoBalance, setUsdsoBalance] = useState<number>(5420.00);
   const [vaultUserBalance, setVaultUserBalance] = useState<number>(1250.00);
 
   // Modals
   const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
+  const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
   const [showContractsModal, setShowContractsModal] = useState<boolean>(false);
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
-  // Connect Wallet: open selector or disconnect
+  // Connect Wallet: open selector or show account details
   const handleConnectWallet = () => {
     if (walletConnected) {
-      setWalletConnected(false);
-      toast.info('Portefeuille déconnecté');
+      setShowAccountModal(true);
       return;
     }
     setShowWalletModal(true);
@@ -204,6 +205,7 @@ export default function Home() {
           const accounts = await provider.request({ method: 'eth_requestAccounts' });
           if (accounts && accounts.length > 0) {
             const acc = accounts[0];
+            setWalletAddressFull(acc);
             setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
             setWalletConnected(true);
             const walletLabel = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
@@ -247,8 +249,12 @@ export default function Home() {
     }
 
     // Fallback demo connection
-    setWalletAddress('0x71C...B829');
+    setWalletAddressFull('0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43');
+    setWalletAddress('0x4eE...cC43');
     setWalletConnected(true);
+    toast.success('Mode Démo Somnia activé !', {
+      description: 'Solde préchargé : $5,420.00 USDso',
+    });
   };
 
   // Confirm Deposit into Vault
@@ -391,29 +397,28 @@ export default function Home() {
       
       {/* Top Banner: Somnia Hackathon Header */}
       <header className="border-b border-surfaceBorder bg-surface/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           
-          {/* Logo & Branding */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/20 flex-shrink-0 relative group">
+          {/* LEFT: Logo & Branding */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="w-9 h-9 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/20 flex-shrink-0 relative group">
               <img src="/logo.jpg" alt="DreamSentinel Logo" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
+                <span className="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
                   DreamSentinel AI
                 </span>
                 <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
                   {t('brand_tag')}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">{t('brand_sub')}</p>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 bg-surfaceBorder/40 p-1 rounded-xl border border-surfaceBorder overflow-x-auto max-w-full">
+          {/* CENTER: Navigation Tabs (Desktop) */}
+          <nav className="hidden lg:flex items-center gap-1 bg-surfaceBorder/40 p-1 rounded-xl border border-surfaceBorder">
             {[
               { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
               { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
@@ -430,7 +435,7 @@ export default function Home() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     isActive 
                       ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm' 
                       : 'text-slate-400 hover:text-slate-200 hover:bg-surfaceBorder/50'
@@ -443,13 +448,13 @@ export default function Home() {
             })}
           </nav>
 
-          {/* Controls: Language, Faucet, Contracts & Wallet */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* RIGHT: Web3 Status, Language, Faucet, Contracts & Wallet */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {/* Language Switcher: EN / FR */}
             <div className="flex items-center rounded-xl bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs font-mono shadow-inner">
               <button
                 onClick={() => toggleLanguage('en')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
+                className={`px-2 py-1 rounded-lg transition-all ${
                   lang === 'en' 
                     ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200'
@@ -460,7 +465,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => toggleLanguage('fr')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
+                className={`px-2 py-1 rounded-lg transition-all ${
                   lang === 'fr' 
                     ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200'
@@ -476,7 +481,7 @@ export default function Home() {
               href="https://testnet.somnia.network/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm"
               title="Obtenir des STT gratuits sur le Faucet Somnia"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
@@ -486,34 +491,82 @@ export default function Home() {
             {/* On-Chain Contracts Button */}
             <button
               onClick={() => setShowContractsModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 font-semibold transition-all shadow-sm"
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 font-semibold transition-all shadow-sm"
               title="Afficher les contrats déployés sur Somnia Shannon Testnet"
             >
               <LinkIcon className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden md:inline">{t('onchain_contracts_btn')}</span>
+              <span className="hidden xl:inline">{t('onchain_contracts_btn')}</span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">4</span>
             </button>
 
             {/* Somnia Shannon Network Indicator */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400">
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>{t('somnia_network')}</span>
+              <span>Somnia (50312)</span>
             </div>
 
-            {/* Connect Wallet Button */}
-            <button
-              onClick={handleConnectWallet}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md ${
-                walletConnected
-                  ? 'bg-surfaceBorder hover:bg-slate-800 text-slate-200 border border-slate-700'
-                  : 'bg-gradient-to-r from-cyan-500 via-teal-400 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-black font-extrabold shadow-cyan-500/25'
-              }`}
-            >
-              <Wallet className="w-4 h-4" />
-              {walletConnected ? `${walletAddress} ($${usdsoBalance.toLocaleString()} USDso)` : t('connect_wallet')}
-            </button>
+            {/* WALLET BUTTON OR ACCOUNT PILL (Polymarket / Uniswap style) */}
+            {walletConnected ? (
+              <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm">
+                {/* Balance Badge */}
+                <div className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden sm:flex items-center gap-1">
+                  <span>${usdsoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-[10px] text-slate-400">USDso</span>
+                </div>
+
+                {/* Account Pill with Dropdown indicator */}
+                <button
+                  onClick={() => setShowAccountModal(true)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surfaceBorder/80 hover:bg-slate-800 text-xs text-cyan-300 font-mono font-bold transition-all border border-slate-700 hover:border-cyan-500/50"
+                  title="Gérer le compte et portefeuille"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>{walletAddress}</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400 rotate-90" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleConnectWallet}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-500 via-teal-400 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-black shadow-md shadow-cyan-500/25 transition-all active:scale-[0.98]"
+              >
+                <Wallet className="w-4 h-4" />
+                <span>{t('connect_wallet')}</span>
+              </button>
+            )}
           </div>
 
+        </div>
+
+        {/* Mobile / Tablet Horizontal Navigation Bar (< lg) */}
+        <div className="lg:hidden px-4 py-2 border-t border-surfaceBorder/40 overflow-x-auto flex items-center gap-1 bg-surface/50">
+          {[
+            { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
+            { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
+            { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare },
+            { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap },
+            { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp },
+            { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords },
+            { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers },
+            { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award },
+          ].map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  isActive 
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {t(tab.labelKey)}
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -1368,6 +1421,96 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* MODAL: ACCOUNT & WALLET DETAILS (Uniswap / Hyperliquid standard) */}
+      {showAccountModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="max-w-md w-full bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 shadow-2xl space-y-5 text-slate-100 relative">
+            <button
+              onClick={() => setShowAccountModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-mono text-emerald-400 uppercase font-bold">
+                  {lang === 'en' ? 'Connected to Somnia Shannon' : 'Connecté à Somnia Shannon'}
+                </span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-100">
+                {lang === 'en' ? 'Account & Wallet' : 'Compte & Portefeuille'}
+              </h3>
+            </div>
+
+            {/* Address & Copy Box */}
+            <div className="p-3.5 rounded-2xl bg-surface/80 border border-surfaceBorder flex items-center justify-between font-mono text-xs">
+              <span className="text-slate-300 truncate max-w-[240px] font-semibold">{walletAddressFull}</span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(walletAddressFull);
+                    toast.success(lang === 'en' ? 'Address copied!' : 'Adresse copiée !');
+                  }}
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 transition-all"
+                  title="Copier l'adresse"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+                <a
+                  href={`https://shannon-explorer.somnia.network/address/${walletAddressFull}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 transition-all"
+                  title="Voir sur Explorer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Balances Card */}
+            <div className="space-y-2 font-mono text-xs">
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-white/[0.06] flex items-center justify-between">
+                <span className="text-slate-400">{lang === 'en' ? 'Collateral Balance (USDso):' : 'Solde Collatéral (USDso):'}</span>
+                <span className="text-emerald-400 font-bold text-sm">
+                  ${usdsoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDso
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-white/[0.06] flex items-center justify-between">
+                <span className="text-slate-400">{lang === 'en' ? 'Somnia Gas Balance (STT):' : 'Solde Gas Somnia (STT):'}</span>
+                <span className="text-cyan-300 font-bold text-sm">18.4200 STT</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2 pt-2">
+              <a
+                href="https://testnet.somnia.network/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center gap-2 transition-all"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>{lang === 'en' ? 'Get STT tokens on Somnia Faucet' : 'Obtenir des jetons STT sur le Faucet'}</span>
+              </a>
+
+              <button
+                onClick={() => {
+                  setWalletConnected(false);
+                  setShowAccountModal(false);
+                  toast.info(lang === 'en' ? 'Wallet disconnected' : 'Portefeuille déconnecté');
+                }}
+                className="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-bold transition-all"
+              >
+                {lang === 'en' ? 'Disconnect Wallet' : 'Déconnecter le Portefeuille'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL 0: MULTI-WALLET SELECTOR */}
       {showWalletModal && (
