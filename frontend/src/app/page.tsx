@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, Cpu, Zap, Shield, Bot, LineChart, 
   Wallet, Award, Activity, ArrowUpRight, Sparkles, MessageSquare, 
   Layers, CheckCircle, AlertTriangle, RefreshCw, Send, Check, ChevronRight, DollarSign, Swords,
-  ExternalLink, Copy, X, Link as LinkIcon
+  ExternalLink, Copy, X, Link as LinkIcon, LogOut
 } from 'lucide-react';
 import { Market, AgentProfile, ThoughtLog, SwarmStatus, ActionCard, CopilotMessage } from '../types';
 import { fetchMarkets, fetchAgents, sendCopilotMessage, executeTrade, getFallbackMarkets, getFallbackSwarmStatus } from '../lib/api';
@@ -128,6 +128,20 @@ export default function Home() {
     setShowWalletModal(true);
   };
 
+  // Disconnect Wallet cleanly
+  const disconnectWallet = () => {
+    setWalletConnected(false);
+    setWalletAddress('');
+    setWalletAddressFull('');
+    setShowAccountModal(false);
+    setShowWalletModal(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('dreamsentinel_wallet_connected');
+      localStorage.removeItem('dreamsentinel_wallet_type');
+    }
+    toast.info(lang === 'en' ? 'Wallet disconnected' : 'Portefeuille déconnecté');
+  };
+
   // EIP-6963 Multi-Wallet Provider Storage
   const [eip6963Wallets, setEip6963Wallets] = useState<any[]>([]);
 
@@ -152,52 +166,87 @@ export default function Home() {
     };
   }, []);
 
-  // Connect via specific provider (MetaMask, Phantom, or Demo)
-  const connectWithProvider = async (walletType: 'metamask' | 'phantom' | 'demo') => {
+  // Connect via specific provider (MetaMask, OKX, Phantom, Coinbase, Injected, or Demo)
+  const connectWithProvider = async (walletType: 'metamask' | 'okx' | 'phantom' | 'coinbase' | 'injected' | 'demo') => {
     setShowWalletModal(false);
 
     if (walletType === 'demo') {
-      setWalletAddress('0x71C...B829');
+      setWalletAddressFull('0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43');
+      setWalletAddress('0x4eE...cC43');
       setWalletConnected(true);
-      toast.success('Portefeuille Somnia Connecté (Mode Démo)', {
-        description: 'Solde actif : $5,420.00 USDso',
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('dreamsentinel_wallet_connected', 'true');
+        localStorage.setItem('dreamsentinel_wallet_type', 'demo');
+      }
+      toast.success(lang === 'en' ? 'Somnia Demo Mode activated!' : 'Mode Démo Somnia activé !', {
+        description: lang === 'en' ? 'Pre-loaded with $5,420.00 USDso' : 'Solde préchargé : $5,420.00 USDso',
       });
       return;
     }
 
     if (typeof window !== 'undefined') {
       let provider: any = null;
-      const eth = (window as any).ethereum;
+      const win = window as any;
+      const eth = win.ethereum;
 
-      if (walletType === 'metamask') {
-        // Priority 1: Isolated EIP-6963 MetaMask provider
+      if (walletType === 'okx') {
+        const eipOkx = eip6963Wallets.find(w => 
+          w.info?.rdns?.toLowerCase().includes('okx') || 
+          w.info?.name?.toLowerCase().includes('okx')
+        );
+        if (eipOkx) {
+          provider = eipOkx.provider;
+        } else if (win.okxwallet) {
+          provider = win.okxwallet;
+        } else if (eth?.providers?.length) {
+          provider = eth.providers.find((p: any) => p.isOkxWallet);
+        } else if (eth?.isOkxWallet) {
+          provider = eth;
+        }
+      } else if (walletType === 'metamask') {
         const eipMetaMask = eip6963Wallets.find(w => 
-          w.info.rdns?.toLowerCase().includes('metamask') || 
-          w.info.name?.toLowerCase().includes('metamask')
+          w.info?.rdns?.toLowerCase().includes('metamask') || 
+          w.info?.name?.toLowerCase().includes('metamask')
         );
         if (eipMetaMask) {
           provider = eipMetaMask.provider;
         } else if (eth?.providers?.length) {
-          provider = eth.providers.find((p: any) => p.isMetaMask && !p.isPhantom) || eth.providers.find((p: any) => p.isMetaMask);
-        } else if (eth && !eth.isPhantom) {
+          provider = eth.providers.find((p: any) => p.isMetaMask && !p.isPhantom && !p.isOkxWallet) || eth.providers.find((p: any) => p.isMetaMask);
+        } else if (eth && !eth.isPhantom && !eth.isOkxWallet) {
           provider = eth;
-        } else {
-          toast.error('Phantom intercepte MetaMask', {
-            description: 'Dans l\'extension Phantom: Paramètres ⚙️ > Portefeuille par défaut > désactivez Phantom pour Ethereum.',
-            duration: 8000
-          });
-          return;
+        } else if (eth?.isMetaMask) {
+          provider = eth;
         }
       } else if (walletType === 'phantom') {
         const eipPhantom = eip6963Wallets.find(w => 
-          w.info.rdns?.toLowerCase().includes('phantom') || 
-          w.info.name?.toLowerCase().includes('phantom')
+          w.info?.rdns?.toLowerCase().includes('phantom') || 
+          w.info?.name?.toLowerCase().includes('phantom')
         );
         if (eipPhantom) {
           provider = eipPhantom.provider;
-        } else {
-          provider = (window as any).phantom?.ethereum || (eth?.providers?.find((p: any) => p.isPhantom)) || (eth?.isPhantom ? eth : null);
+        } else if (win.phantom?.ethereum) {
+          provider = win.phantom?.ethereum;
+        } else if (eth?.providers?.find((p: any) => p.isPhantom)) {
+          provider = eth.providers.find((p: any) => p.isPhantom);
+        } else if (eth?.isPhantom) {
+          provider = eth;
         }
+      } else if (walletType === 'coinbase') {
+        const eipCoinbase = eip6963Wallets.find(w => 
+          w.info?.rdns?.toLowerCase().includes('coinbase') || 
+          w.info?.name?.toLowerCase().includes('coinbase')
+        );
+        if (eipCoinbase) {
+          provider = eipCoinbase.provider;
+        } else if (win.coinbaseWalletExtension) {
+          provider = win.coinbaseWalletExtension;
+        } else if (eth?.providers?.find((p: any) => p.isCoinbaseWallet)) {
+          provider = eth.providers.find((p: any) => p.isCoinbaseWallet);
+        } else if (eth?.isCoinbaseWallet) {
+          provider = eth;
+        }
+      } else if (walletType === 'injected') {
+        provider = eth || win.okxwallet || win.phantom?.ethereum;
       }
 
       if (provider) {
@@ -208,9 +257,17 @@ export default function Home() {
             setWalletAddressFull(acc);
             setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
             setWalletConnected(true);
-            const walletLabel = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
-            toast.success(`Portefeuille connecté via ${walletLabel} !`, {
-              description: `Connecté à ${acc.slice(0, 8)}... sur Somnia`,
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('dreamsentinel_wallet_connected', 'true');
+              localStorage.setItem('dreamsentinel_wallet_type', walletType);
+            }
+            const walletLabel = 
+              walletType === 'okx' ? 'OKX Wallet' :
+              walletType === 'metamask' ? 'MetaMask' :
+              walletType === 'phantom' ? 'Phantom' :
+              walletType === 'coinbase' ? 'Coinbase' : 'Web3 Wallet';
+            toast.success(lang === 'en' ? `Connected via ${walletLabel}!` : `Portefeuille connecté via ${walletLabel} !`, {
+              description: `Somnia Shannon: ${acc.slice(0, 8)}...`,
             });
             try {
               await provider.request({
@@ -234,27 +291,67 @@ export default function Home() {
             return;
           }
         } catch (err: any) {
-          toast.error(`Connexion annulée ou rejetée`, {
-            description: err?.message || 'Vérifiez la signature dans votre portefeuille',
+          toast.error(lang === 'en' ? 'Connection cancelled or rejected' : 'Connexion annulée ou rejetée', {
+            description: err?.message || 'Check request in wallet extension',
           });
           return;
         }
       } else {
-        const walletLabel = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
-        toast.error(`Extension ${walletLabel} introuvable`, {
-          description: `Veuillez activer ${walletLabel} ou utiliser le mode Démo.`,
+        const walletLabel = 
+          walletType === 'okx' ? 'OKX Wallet' :
+          walletType === 'metamask' ? 'MetaMask' :
+          walletType === 'phantom' ? 'Phantom' :
+          walletType === 'coinbase' ? 'Coinbase' : 'Web3 Wallet';
+        toast.error(lang === 'en' ? `${walletLabel} extension not found` : `Extension ${walletLabel} introuvable`, {
+          description: lang === 'en' ? `Please install ${walletLabel} or use Somnia Demo Mode.` : `Veuillez activer ${walletLabel} ou utiliser le mode Démo Somnia.`,
         });
         return;
       }
     }
+  };
 
-    // Fallback demo connection
-    setWalletAddressFull('0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43');
-    setWalletAddress('0x4eE...cC43');
-    setWalletConnected(true);
-    toast.success('Mode Démo Somnia activé !', {
-      description: 'Solde préchargé : $5,420.00 USDso',
-    });
+  // Connect via EIP-6963 provider directly
+  const connectWithEip6963 = async (walletDetail: any) => {
+    setShowWalletModal(false);
+    const provider = walletDetail.provider;
+    try {
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      if (accounts && accounts.length > 0) {
+        const acc = accounts[0];
+        setWalletAddressFull(acc);
+        setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
+        setWalletConnected(true);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('dreamsentinel_wallet_connected', 'true');
+        }
+        toast.success(lang === 'en' ? `Connected to ${walletDetail.info.name}!` : `Connecté à ${walletDetail.info.name} !`, {
+          description: `Somnia Shannon: ${acc.slice(0, 8)}...`,
+        });
+        try {
+          await provider.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0xc488' }],
+          });
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            await provider.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0xc488',
+                chainName: 'Somnia Shannon Testnet',
+                nativeCurrency: { name: 'STT', symbol: 'STT', decimals: 18 },
+                rpcUrls: ['https://dream-rpc.somnia.network'],
+                blockExplorerUrls: ['https://shannon-explorer.somnia.network/']
+              }]
+            });
+          }
+        }
+      }
+    } catch (err: any) {
+      toast.error(lang === 'en' ? 'Connection cancelled or rejected' : 'Connexion annulée ou rejetée', {
+        description: err?.message || 'Check request in wallet extension',
+      });
+    }
   };
 
   // Confirm Deposit into Vault
@@ -509,7 +606,11 @@ export default function Home() {
             {walletConnected ? (
               <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm">
                 {/* Balance Badge */}
-                <div className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden sm:flex items-center gap-1">
+                <div 
+                  onClick={() => setShowAccountModal(true)}
+                  className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden sm:flex items-center gap-1 cursor-pointer hover:bg-cyan-900/40 transition-colors"
+                  title={lang === 'en' ? 'Click to view account' : 'Cliquer pour voir le compte'}
+                >
                   <span>${usdsoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   <span className="text-[10px] text-slate-400">USDso</span>
                 </div>
@@ -518,11 +619,23 @@ export default function Home() {
                 <button
                   onClick={() => setShowAccountModal(true)}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surfaceBorder/80 hover:bg-slate-800 text-xs text-cyan-300 font-mono font-bold transition-all border border-slate-700 hover:border-cyan-500/50"
-                  title="Gérer le compte et portefeuille"
+                  title={lang === 'en' ? 'Account & wallet details' : 'Gérer le compte et portefeuille'}
                 >
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>{walletAddress}</span>
                   <ChevronRight className="w-3 h-3 text-slate-400 rotate-90" />
+                </button>
+
+                {/* Quick Disconnect Icon Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    disconnectWallet();
+                  }}
+                  className="p-1 rounded-lg hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-all ml-0.5"
+                  title={lang === 'en' ? 'Disconnect wallet' : 'Déconnecter le portefeuille'}
+                >
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
@@ -1498,21 +1611,18 @@ export default function Home() {
               </a>
 
               <button
-                onClick={() => {
-                  setWalletConnected(false);
-                  setShowAccountModal(false);
-                  toast.info(lang === 'en' ? 'Wallet disconnected' : 'Portefeuille déconnecté');
-                }}
-                className="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-bold transition-all"
+                onClick={disconnectWallet}
+                className="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-bold transition-all flex items-center justify-center gap-2"
               >
-                {lang === 'en' ? 'Disconnect Wallet' : 'Déconnecter le Portefeuille'}
+                <LogOut className="w-3.5 h-3.5" />
+                <span>{lang === 'en' ? 'Disconnect Wallet' : 'Déconnecter le Portefeuille'}</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL 0: MULTI-WALLET SELECTOR */}
+      {/* MODAL 0: MULTI-WALLET SELECTOR (OKX, MetaMask, Phantom, Rabby, Coinbase) */}
       {showWalletModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
           <div className="max-w-md w-full bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 shadow-2xl space-y-5 text-slate-100 relative">
@@ -1524,24 +1634,84 @@ export default function Home() {
             </button>
 
             <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                <span className="text-[11px] font-mono text-cyan-400 uppercase font-bold">Somnia Shannon Testnet</span>
+              </div>
               <h3 className="text-lg font-bold text-slate-100">{t('wallet_modal_title')}</h3>
               <p className="text-xs text-slate-400">
-                {t('wallet_modal_sub')}
+                {lang === 'en' ? 'Select your Web3 wallet or use the Somnia 1-Click Demo' : 'Sélectionnez votre portefeuille Web3 ou utilisez la démo 1-clic'}
               </p>
             </div>
 
-            <div className="space-y-3">
-              {/* Option 1: MetaMask / EVM */}
+            {/* Dynamic EIP-6963 Detected Wallets (if any extension detected) */}
+            {eip6963Wallets.length > 0 && (
+              <div className="space-y-2 pb-2 border-b border-white/[0.06]">
+                <div className="text-[10px] uppercase font-mono text-slate-400 font-bold tracking-wider px-1">
+                  {lang === 'en' ? 'Detected Extensions in your Browser' : 'Extensions Détectées dans votre Navigateur'}
+                </div>
+                <div className="space-y-2">
+                  {eip6963Wallets.map(w => (
+                    <button
+                      key={w.info?.uuid || w.info?.name}
+                      onClick={() => connectWithEip6963(w)}
+                      className="w-full p-3.5 rounded-2xl bg-slate-950/80 hover:bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-400 flex items-center justify-between transition-all group text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        {w.info?.icon ? (
+                          <img src={w.info.icon} alt={w.info.name} className="w-7 h-7 rounded-lg object-contain" />
+                        ) : (
+                          <div className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center font-bold text-cyan-300">⚡</div>
+                        )}
+                        <div>
+                          <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">{w.info?.name}</h4>
+                          <p className="text-[10px] text-slate-400 font-mono">EIP-6963 Direct Interop</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono">
+                        Connect
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Standard Supported Providers List */}
+            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+              {/* Option 1: OKX Wallet */}
+              <button
+                onClick={() => connectWithProvider('okx')}
+                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-white/[0.06] border border-surfaceBorder hover:border-white/40 flex items-center justify-between transition-all group text-left"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-black border border-white/20 flex items-center justify-center text-xl font-black text-white font-mono">
+                    ⬛
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm text-slate-200 group-hover:text-white transition-colors">OKX Wallet</h4>
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-mono">OKX</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">{lang === 'en' ? 'OKX Web3 multi-chain extension' : 'Extension multi-chaînes OKX Web3'}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono">
+                  EVM
+                </span>
+              </button>
+
+              {/* Option 2: MetaMask */}
               <button
                 onClick={() => connectWithProvider('metamask')}
-                className="w-full p-4 rounded-2xl bg-surface/80 hover:bg-cyan-500/10 border border-surfaceBorder hover:border-cyan-500/50 flex items-center justify-between transition-all group text-left"
+                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-amber-500/10 border border-surfaceBorder hover:border-amber-500/50 flex items-center justify-between transition-all group text-left"
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">
                     🦊
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">MetaMask</h4>
+                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-amber-300 transition-colors">MetaMask</h4>
                     <p className="text-[11px] text-slate-400">{t('wallet_metamask_sub')}</p>
                   </div>
                 </div>
@@ -1550,10 +1720,10 @@ export default function Home() {
                 </span>
               </button>
 
-              {/* Option 2: Phantom */}
+              {/* Option 3: Phantom */}
               <button
                 onClick={() => connectWithProvider('phantom')}
-                className="w-full p-4 rounded-2xl bg-surface/80 hover:bg-purple-500/10 border border-surfaceBorder hover:border-purple-500/50 flex items-center justify-between transition-all group text-left"
+                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-purple-500/10 border border-surfaceBorder hover:border-purple-500/50 flex items-center justify-between transition-all group text-left"
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl">
@@ -1569,10 +1739,31 @@ export default function Home() {
                 </span>
               </button>
 
-              {/* Option 3: Somnia Demo */}
+              {/* Option 4: Other Web3 (Coinbase / Rabby / Brave) */}
+              <button
+                onClick={() => connectWithProvider('injected')}
+                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-cyan-500/10 border border-surfaceBorder hover:border-cyan-500/50 flex items-center justify-between transition-all group text-left"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xl">
+                    🌐
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">
+                      {lang === 'en' ? 'Other EVM Wallet' : 'Autre Portefeuille EVM'}
+                    </h4>
+                    <p className="text-[11px] text-slate-400">Rabby, Coinbase, Brave, Frame</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 font-mono">
+                  Web3
+                </span>
+              </button>
+
+              {/* Option 5: Somnia 1-Click Demo */}
               <button
                 onClick={() => connectWithProvider('demo')}
-                className="w-full p-4 rounded-2xl bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-cyan-500/30 hover:border-cyan-400 flex items-center justify-between transition-all group text-left shadow-sm"
+                className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/50 via-teal-950/40 to-slate-900 border border-cyan-500/40 hover:border-cyan-300 flex items-center justify-between transition-all group text-left shadow-sm"
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xl">
@@ -1589,8 +1780,8 @@ export default function Home() {
               </button>
             </div>
 
-            <p className="text-[11px] text-slate-500 text-center pt-1">
-              Réseau : Somnia Shannon Testnet • Chain ID 50312
+            <p className="text-[11px] text-slate-500 text-center pt-1 font-mono">
+              Somnia Shannon Testnet • Chain ID: 50312
             </p>
           </div>
         </div>
