@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://dream-sentinel-ai.vercel.app'),
   title: 'DreamSentinel AI | Somnia Event Contracts',
   description: 'Autonomous Agent Swarm, Copy-Trading Vaults, and PvP Duels for DreamDEX Event Contracts.',
   icons: {
@@ -20,8 +22,6 @@ export const metadata: Metadata = {
     images: ['/logo.jpg'],
   }
 };
-
-import { Toaster } from 'sonner';
 
 export default function RootLayout({
   children,
