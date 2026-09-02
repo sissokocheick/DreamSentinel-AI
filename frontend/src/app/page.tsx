@@ -95,6 +95,30 @@ export default function Home() {
     setShowWalletModal(true);
   };
 
+  // EIP-6963 Multi-Wallet Provider Storage
+  const [eip6963Wallets, setEip6963Wallets] = useState<any[]>([]);
+
+  useEffect(() => {
+    const handleAnnounce = (event: any) => {
+      if (!event.detail) return;
+      setEip6963Wallets(prev => {
+        if (prev.some(w => w.info.uuid === event.detail.info.uuid)) return prev;
+        return [...prev, event.detail];
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('eip6963:announceProvider', handleAnnounce);
+      window.dispatchEvent(new Event('eip6963:requestProvider'));
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('eip6963:announceProvider', handleAnnounce);
+      }
+    };
+  }, []);
+
   // Connect via specific provider (MetaMask, Phantom, or Demo)
   const connectWithProvider = async (walletType: 'metamask' | 'phantom' | 'demo') => {
     setShowWalletModal(false);
@@ -112,15 +136,34 @@ export default function Home() {
       let provider: any = null;
       const eth = (window as any).ethereum;
 
-      if (walletType === 'phantom') {
-        provider = (window as any).phantom?.ethereum || (eth?.providers?.find((p: any) => p.isPhantom)) || (eth?.isPhantom ? eth : null);
-      } else if (walletType === 'metamask') {
-        if (eth?.providers?.length) {
+      if (walletType === 'metamask') {
+        // Priority 1: Isolated EIP-6963 MetaMask provider
+        const eipMetaMask = eip6963Wallets.find(w => 
+          w.info.rdns?.toLowerCase().includes('metamask') || 
+          w.info.name?.toLowerCase().includes('metamask')
+        );
+        if (eipMetaMask) {
+          provider = eipMetaMask.provider;
+        } else if (eth?.providers?.length) {
           provider = eth.providers.find((p: any) => p.isMetaMask && !p.isPhantom) || eth.providers.find((p: any) => p.isMetaMask);
         } else if (eth && !eth.isPhantom) {
           provider = eth;
         } else {
-          provider = eth;
+          toast.error('Phantom intercepte MetaMask', {
+            description: 'Dans l\'extension Phantom: Paramètres ⚙️ > Portefeuille par défaut > désactivez Phantom pour Ethereum.',
+            duration: 8000
+          });
+          return;
+        }
+      } else if (walletType === 'phantom') {
+        const eipPhantom = eip6963Wallets.find(w => 
+          w.info.rdns?.toLowerCase().includes('phantom') || 
+          w.info.name?.toLowerCase().includes('phantom')
+        );
+        if (eipPhantom) {
+          provider = eipPhantom.provider;
+        } else {
+          provider = (window as any).phantom?.ethereum || (eth?.providers?.find((p: any) => p.isPhantom)) || (eth?.isPhantom ? eth : null);
         }
       }
 
