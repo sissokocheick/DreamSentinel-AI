@@ -106,10 +106,11 @@ export default function Home() {
 
   // Wallet
   const [walletConnected, setWalletConnected] = useState<boolean>(false);
-  const [walletAddress, setWalletAddress] = useState<string>('0x4eE...cC43');
-  const [walletAddressFull, setWalletAddressFull] = useState<string>('0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43');
+  const [walletAddress, setWalletAddress] = useState<string>('');
+  const [walletAddressFull, setWalletAddressFull] = useState<string>('');
   const [usdsoBalance, setUsdsoBalance] = useState<number>(5420.00);
   const [vaultUserBalance, setVaultUserBalance] = useState<number>(1250.00);
+  const activeProviderRef = useRef<any>(null);
 
   // Modals
   const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
@@ -119,27 +120,46 @@ export default function Home() {
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
-  // Connect Wallet: open selector or show account details
+  // Connect Wallet: open selector
   const handleConnectWallet = () => {
-    if (walletConnected) {
-      setShowAccountModal(true);
-      return;
-    }
     setShowWalletModal(true);
   };
 
-  // Disconnect Wallet cleanly
-  const disconnectWallet = () => {
-    setWalletConnected(false);
-    setWalletAddress('');
-    setWalletAddressFull('');
-    setShowAccountModal(false);
-    setShowWalletModal(false);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('dreamsentinel_wallet_connected');
-      localStorage.removeItem('dreamsentinel_wallet_type');
+  // Disconnect Wallet cleanly & aggressively (EIP-1193 + MetaMask revoke + state reset)
+  const disconnectWallet = async () => {
+    try {
+      if (activeProviderRef.current) {
+        // 1. EIP-1193 disconnect method (OKX, Phantom, Coinbase)
+        if (typeof activeProviderRef.current.disconnect === 'function') {
+          await activeProviderRef.current.disconnect();
+        }
+        // 2. MetaMask / EIP-2255 revoke permission request
+        if (typeof activeProviderRef.current.request === 'function') {
+          try {
+            await activeProviderRef.current.request({
+              method: 'wallet_revokePermissions',
+              params: [{ eth_accounts: {} }]
+            });
+          } catch (e) {
+            // Not all wallets support wallet_revokePermissions, safe to ignore
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Disconnect error:', err);
+    } finally {
+      activeProviderRef.current = null;
+      setWalletConnected(false);
+      setWalletAddress('');
+      setWalletAddressFull('');
+      setShowAccountModal(false);
+      setShowWalletModal(false);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('dreamsentinel_wallet_connected');
+        localStorage.removeItem('dreamsentinel_wallet_type');
+      }
+      toast.info(lang === 'en' ? 'Wallet disconnected successfully' : 'Portefeuille déconnecté avec succès');
     }
-    toast.info(lang === 'en' ? 'Wallet disconnected' : 'Portefeuille déconnecté');
   };
 
   // EIP-6963 Multi-Wallet Provider Storage
@@ -196,6 +216,8 @@ export default function Home() {
         );
         if (eipOkx) {
           provider = eipOkx.provider;
+        } else if (win.okxwallet?.ethereum) {
+          provider = win.okxwallet.ethereum;
         } else if (win.okxwallet) {
           provider = win.okxwallet;
         } else if (eth?.providers?.length) {
@@ -246,11 +268,12 @@ export default function Home() {
           provider = eth;
         }
       } else if (walletType === 'injected') {
-        provider = eth || win.okxwallet || win.phantom?.ethereum;
+        provider = eth || win.okxwallet?.ethereum || win.okxwallet || win.phantom?.ethereum;
       }
 
       if (provider) {
         try {
+          activeProviderRef.current = provider;
           const accounts = await provider.request({ method: 'eth_requestAccounts' });
           if (accounts && accounts.length > 0) {
             const acc = accounts[0];
@@ -314,6 +337,7 @@ export default function Home() {
   const connectWithEip6963 = async (walletDetail: any) => {
     setShowWalletModal(false);
     const provider = walletDetail.provider;
+    activeProviderRef.current = provider;
     try {
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
@@ -604,38 +628,38 @@ export default function Home() {
 
             {/* WALLET BUTTON OR ACCOUNT PILL (Polymarket / Uniswap style) */}
             {walletConnected ? (
-              <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm">
-                {/* Balance Badge */}
-                <div 
-                  onClick={() => setShowAccountModal(true)}
-                  className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden sm:flex items-center gap-1 cursor-pointer hover:bg-cyan-900/40 transition-colors"
-                  title={lang === 'en' ? 'Click to view account' : 'Cliquer pour voir le compte'}
-                >
-                  <span>${usdsoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  <span className="text-[10px] text-slate-400">USDso</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm">
+                  {/* Balance Badge */}
+                  <div 
+                    onClick={() => setShowAccountModal(true)}
+                    className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden sm:flex items-center gap-1 cursor-pointer hover:bg-cyan-900/40 transition-colors"
+                    title={lang === 'en' ? 'Click to view account' : 'Cliquer pour voir le compte'}
+                  >
+                    <span>${usdsoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="text-[10px] text-slate-400">USDso</span>
+                  </div>
+
+                  {/* Account Pill with Dropdown indicator */}
+                  <button
+                    onClick={() => setShowAccountModal(true)}
+                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg bg-surfaceBorder/80 hover:bg-slate-800 text-xs text-cyan-300 font-mono font-bold transition-all border border-slate-700 hover:border-cyan-500/50"
+                    title={lang === 'en' ? 'Account & wallet details' : 'Gérer le compte et portefeuille'}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{walletAddress}</span>
+                    <ChevronRight className="w-3 h-3 text-slate-400 rotate-90" />
+                  </button>
                 </div>
 
-                {/* Account Pill with Dropdown indicator */}
+                {/* Highly Visible Dedicated Disconnect Button */}
                 <button
-                  onClick={() => setShowAccountModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surfaceBorder/80 hover:bg-slate-800 text-xs text-cyan-300 font-mono font-bold transition-all border border-slate-700 hover:border-cyan-500/50"
-                  title={lang === 'en' ? 'Account & wallet details' : 'Gérer le compte et portefeuille'}
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{walletAddress}</span>
-                  <ChevronRight className="w-3 h-3 text-slate-400 rotate-90" />
-                </button>
-
-                {/* Quick Disconnect Icon Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    disconnectWallet();
-                  }}
-                  className="p-1 rounded-lg hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-all ml-0.5"
+                  onClick={disconnectWallet}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 hover:border-rose-500/60 text-rose-300 hover:text-rose-100 text-xs font-bold transition-all shadow-sm active:scale-95 shrink-0"
                   title={lang === 'en' ? 'Disconnect wallet' : 'Déconnecter le portefeuille'}
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                  <span className="text-[11px] font-bold">{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
                 </button>
               </div>
             ) : (
@@ -1612,10 +1636,10 @@ export default function Home() {
 
               <button
                 onClick={disconnectWallet}
-                className="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-bold transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 hover:text-rose-100 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-md active:scale-98"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>{lang === 'en' ? 'Disconnect Wallet' : 'Déconnecter le Portefeuille'}</span>
+                <LogOut className="w-4 h-4 text-rose-400" />
+                <span>{lang === 'en' ? 'Disconnect This Wallet' : 'Déconnecter ce Portefeuille'}</span>
               </button>
             </div>
           </div>
@@ -1643,6 +1667,25 @@ export default function Home() {
                 {lang === 'en' ? 'Select your Web3 wallet or use the Somnia 1-Click Demo' : 'Sélectionnez votre portefeuille Web3 ou utilisez la démo 1-clic'}
               </p>
             </div>
+
+            {/* If currently connected: Quick Disconnect Bar */}
+            {walletConnected && (
+              <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs text-slate-300 font-mono">
+                    {lang === 'en' ? 'Active Wallet:' : 'Portefeuille Actif :'} <strong className="text-emerald-400">{walletAddress}</strong>
+                  </span>
+                </div>
+                <button
+                  onClick={disconnectWallet}
+                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold transition-all flex items-center gap-1 active:scale-95"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
+                </button>
+              </div>
+            )}
 
             {/* Dynamic EIP-6963 Detected Wallets (if any extension detected) */}
             {eip6963Wallets.length > 0 && (
