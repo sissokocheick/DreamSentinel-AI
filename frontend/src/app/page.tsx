@@ -57,6 +57,59 @@ const PvPDuels = dynamic(
 );
 
 
+// Official & Pro Web3 Wallet SVG Icons
+const MetaMaskIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M29.1 4.7L18.4 12.6l2 4.7 7.7-2.3 1-10.3z" fill="#E2761B" stroke="#E2761B" strokeWidth="0.2"/>
+    <path d="M2.9 4.7l1 10.3 7.7 2.3 2-4.7L2.9 4.7z" fill="#E2761B" stroke="#E2761B" strokeWidth="0.2"/>
+    <path d="M24.7 22.8l-7.3-2.1 1-4.7 6.3 6.8z" fill="#E4751F"/>
+    <path d="M7.3 22.8l6.3-6.8 1 4.7-7.3 2.1z" fill="#E4751F"/>
+    <path d="M10.7 17.3l-2 4.7 7.3-2.1v-7.3l-5.3 4.7z" fill="#D7C1B3"/>
+    <path d="M21.3 17.3l-5.3-4.7v7.3l7.3 2.1-2-4.7z" fill="#D7C1B3"/>
+    <path d="M16 19.9l-4.7 3.3 3.3 2.7 1.4-1.3 1.4 1.3 3.3-2.7-4.7-3.3z" fill="#233447"/>
+    <path d="M2.9 4.7l9.7 7.9-1 4.7L2.9 4.7z" fill="#F6851B"/>
+    <path d="M29.1 4.7l-8.7 12.6-1-4.7 9.7-7.9z" fill="#F6851B"/>
+    <path d="M16 12.6l-2-4.7h-3.3l5.3 4.7 5.3-4.7H18l-2 4.7z" fill="#F6851B"/>
+  </svg>
+);
+
+const OKXWalletIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="7" fill="#000000" stroke="#334155" strokeWidth="1"/>
+    <rect x="7" y="7" width="5.5" height="5.5" rx="1" fill="#FFFFFF"/>
+    <rect x="19.5" y="7" width="5.5" height="5.5" rx="1" fill="#FFFFFF"/>
+    <rect x="13.25" y="13.25" width="5.5" height="5.5" rx="1" fill="#FFFFFF"/>
+    <rect x="7" y="19.5" width="5.5" height="5.5" rx="1" fill="#FFFFFF"/>
+    <rect x="19.5" y="19.5" width="5.5" height="5.5" rx="1" fill="#FFFFFF"/>
+  </svg>
+);
+
+const PhantomWalletIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="7" fill="#5344C0"/>
+    <path d="M22.5 16.5C22.5 12.91 19.59 10 16 10C12.41 10 9.5 12.91 9.5 16.5C9.5 20.09 11.2 22 12.5 22C13.8 22 14.2 20.7 16 20.7C17.8 20.7 18.2 22 19.5 22C20.8 22 22.5 20.09 22.5 16.5Z" fill="#FFFFFF"/>
+    <circle cx="13.8" cy="15.8" r="1.3" fill="#5344C0"/>
+    <circle cx="18.2" cy="15.8" r="1.3" fill="#5344C0"/>
+  </svg>
+);
+
+const CoinbaseWalletIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="7" fill="#0052FF"/>
+    <circle cx="16" cy="16" r="7" fill="#FFFFFF"/>
+    <rect x="13.5" y="13.5" width="5" height="5" rx="1" fill="#0052FF"/>
+  </svg>
+);
+
+const GenericWeb3Icon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="7" fill="#0F172A" stroke="#334155" strokeWidth="1"/>
+    <circle cx="16" cy="16" r="8" stroke="#38BDF8" strokeWidth="1.5"/>
+    <ellipse cx="16" cy="16" rx="4" ry="8" stroke="#38BDF8" strokeWidth="1.2"/>
+    <line x1="8" y1="16" x2="24" y2="16" stroke="#38BDF8" strokeWidth="1.2"/>
+  </svg>
+);
+
 export default function Home() {
   // Internationalization (Default English, browser auto-detect or localStorage)
   const [lang, setLang] = useState<Language>('en');
@@ -118,6 +171,7 @@ export default function Home() {
   const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
   const [showContractsModal, setShowContractsModal] = useState<boolean>(false);
   const [showFaucetModal, setShowFaucetModal] = useState<boolean>(false);
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
@@ -189,10 +243,10 @@ export default function Home() {
   }, []);
 
   // Connect via specific provider (MetaMask, OKX, Phantom, Coinbase, Injected, or Demo)
+  // Connect via specific provider (MetaMask, OKX, Phantom, Coinbase, Injected, or Demo)
   const connectWithProvider = async (walletType: 'metamask' | 'okx' | 'phantom' | 'coinbase' | 'injected' | 'demo') => {
-    setShowWalletModal(false);
-
     if (walletType === 'demo') {
+      setShowWalletModal(false);
       setWalletAddressFull('0x4eEdf2C5fa631BB1A65B59445745e9d35837cC43');
       setWalletAddress('0x4eE...cC43');
       setWalletConnected(true);
@@ -205,6 +259,8 @@ export default function Home() {
       });
       return;
     }
+
+    setConnectingWallet(walletType);
 
     if (typeof window !== 'undefined') {
       let provider: any = null;
@@ -282,6 +338,7 @@ export default function Home() {
             setWalletAddressFull(acc);
             setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
             setWalletConnected(true);
+            setShowWalletModal(false);
             if (typeof window !== 'undefined') {
               localStorage.setItem('dreamsentinel_wallet_connected', 'true');
               localStorage.setItem('dreamsentinel_wallet_type', walletType);
@@ -320,8 +377,11 @@ export default function Home() {
             description: err?.message || 'Check request in wallet extension',
           });
           return;
+        } finally {
+          setConnectingWallet(null);
         }
       } else {
+        setConnectingWallet(null);
         const walletLabel = 
           walletType === 'okx' ? 'OKX Wallet' :
           walletType === 'metamask' ? 'MetaMask' :
@@ -337,7 +397,7 @@ export default function Home() {
 
   // Connect via EIP-6963 provider directly
   const connectWithEip6963 = async (walletDetail: any) => {
-    setShowWalletModal(false);
+    setConnectingWallet(walletDetail.info?.name || 'eip6963');
     const provider = walletDetail.provider;
     activeProviderRef.current = provider;
     try {
@@ -347,6 +407,7 @@ export default function Home() {
         setWalletAddressFull(acc);
         setWalletAddress(`${acc.slice(0, 6)}...${acc.slice(-4)}`);
         setWalletConnected(true);
+        setShowWalletModal(false);
         if (typeof window !== 'undefined') {
           localStorage.setItem('dreamsentinel_wallet_connected', 'true');
         }
@@ -374,9 +435,11 @@ export default function Home() {
         }
       }
     } catch (err: any) {
-      toast.error(lang === 'en' ? 'Connection cancelled or rejected' : 'Connexion annulée ou rejetée', {
+      toast.error(lang === 'en' ? 'Connection cancelled' : 'Connexion annulée', {
         description: err?.message || 'Check request in wallet extension',
       });
+    } finally {
+      setConnectingWallet(null);
     }
   };
 
@@ -1739,186 +1802,297 @@ export default function Home() {
         </div>
       )}
 
-      {/* MODAL 0: MULTI-WALLET SELECTOR (OKX, MetaMask, Phantom, Rabby, Coinbase) */}
+      {/* MODAL 0: PRO MULTI-WALLET SELECTOR (OKX, MetaMask, Phantom, Coinbase, Injected & Demo) */}
       {showWalletModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="max-w-md w-full bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 shadow-2xl space-y-5 text-slate-100 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="max-w-lg w-full bg-slate-900/95 border border-white/[0.12] rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-100 relative overflow-hidden">
+            {/* Top ambient highlight line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-purple-500" />
+
             <button
               onClick={() => setShowWalletModal(false)}
-              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-all"
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-all active:scale-95"
             >
               <X className="w-5 h-5" />
             </button>
 
+            {/* Header */}
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-                <span className="text-[11px] font-mono text-cyan-400 uppercase font-bold">Somnia Shannon Testnet</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[11px] font-mono text-cyan-400 uppercase font-bold tracking-wider">
+                  Somnia Shannon Testnet • Chain ID: 50312
+                </span>
               </div>
-              <h3 className="text-lg font-bold text-slate-100">{t('wallet_modal_title')}</h3>
-              <p className="text-xs text-slate-400">
-                {lang === 'en' ? 'Select your Web3 wallet or use the Somnia 1-Click Demo' : 'Sélectionnez votre portefeuille Web3 ou utilisez la démo 1-clic'}
+              <h3 className="text-xl font-bold text-slate-100 tracking-tight">
+                {t('wallet_modal_title')}
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {t('wallet_modal_sub')}
               </p>
             </div>
 
-            {/* If currently connected: Quick Disconnect Bar */}
+            {/* If currently connected: Quick Active Status Bar with 1-Click Disconnect */}
             {walletConnected && (
-              <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between shadow-inner">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">
+                      {lang === 'en' ? 'Active Connection' : 'Connexion Active'}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-slate-200">
+                      {walletAddress}
+                    </span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs text-slate-300 font-mono">
-                    {lang === 'en' ? 'Active Wallet:' : 'Portefeuille Actif :'} <strong className="text-emerald-400">{walletAddress}</strong>
-                  </span>
-                </div>
-                <button
-                  onClick={disconnectWallet}
-                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold transition-all flex items-center gap-1 active:scale-95"
-                >
-                  <LogOut className="w-3 h-3" />
-                  <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
-                </button>
-              </div>
-            )}
-
-            {/* Dynamic EIP-6963 Detected Wallets (if any extension detected) */}
-            {eip6963Wallets.length > 0 && (
-              <div className="space-y-2 pb-2 border-b border-white/[0.06]">
-                <div className="text-[10px] uppercase font-mono text-slate-400 font-bold tracking-wider px-1">
-                  {lang === 'en' ? 'Detected Extensions in your Browser' : 'Extensions Détectées dans votre Navigateur'}
-                </div>
-                <div className="space-y-2">
-                  {eip6963Wallets.map(w => (
-                    <button
-                      key={w.info?.uuid || w.info?.name}
-                      onClick={() => connectWithEip6963(w)}
-                      className="w-full p-3.5 rounded-2xl bg-slate-950/80 hover:bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-400 flex items-center justify-between transition-all group text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        {w.info?.icon ? (
-                          <img src={w.info.icon} alt={w.info.name} className="w-7 h-7 rounded-lg object-contain" />
-                        ) : (
-                          <div className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center font-bold text-cyan-300">⚡</div>
-                        )}
-                        <div>
-                          <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">{w.info?.name}</h4>
-                          <p className="text-[10px] text-slate-400 font-mono">EIP-6963 Direct Interop</p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono">
-                        Connect
-                      </span>
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(walletAddressFull);
+                      toast.success(lang === 'en' ? 'Address copied!' : 'Adresse copiée !');
+                    }}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all text-xs active:scale-95"
+                    title={lang === 'en' ? 'Copy address' : 'Copier l\'adresse'}
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={disconnectWallet}
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 hover:text-white border border-rose-500/40 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                    <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* Standard Supported Providers List */}
+            {/* Provider List */}
             <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-              {/* Option 1: OKX Wallet */}
+              {/* Dynamic EIP-6963 Detected Wallets (if any extension announced) */}
+              {eip6963Wallets.map(w => (
+                <button
+                  key={w.info?.uuid || w.info?.name}
+                  onClick={() => connectWithEip6963(w)}
+                  disabled={connectingWallet !== null}
+                  className="w-full p-3.5 rounded-2xl bg-slate-950/70 hover:bg-cyan-500/10 border border-white/[0.08] hover:border-cyan-500/50 flex items-center justify-between transition-all group text-left shadow-sm active:scale-[0.99]"
+                >
+                  <div className="flex items-center gap-3.5">
+                    {w.info?.icon ? (
+                      <img src={w.info.icon} alt={w.info.name} className="w-8 h-8 rounded-xl object-contain shadow-sm" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/20 flex items-center justify-center font-bold text-cyan-300">
+                        ⚡
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <h4 className="font-bold text-sm text-slate-100 group-hover:text-cyan-300 transition-colors">
+                          {w.info?.name}
+                        </h4>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-mono">
+                          {t('wallet_detected_badge')}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-mono">EIP-6963 Standard</p>
+                    </div>
+                  </div>
+                  {connectingWallet === w.info?.name ? (
+                    <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-all" />
+                  )}
+                </button>
+              ))}
+
+              {/* 1. OKX Wallet */}
               <button
                 onClick={() => connectWithProvider('okx')}
-                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-white/[0.06] border border-surfaceBorder hover:border-white/40 flex items-center justify-between transition-all group text-left"
+                disabled={connectingWallet !== null}
+                className="w-full p-3.5 rounded-2xl bg-slate-950/70 hover:bg-white/[0.05] border border-white/[0.08] hover:border-slate-400 flex items-center justify-between transition-all group text-left shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-black border border-white/20 flex items-center justify-center text-xl font-black text-white font-mono">
-                    ⬛
+                  <div className="p-1 rounded-xl bg-black border border-white/20 shadow-inner">
+                    <OKXWalletIcon className="w-7 h-7" />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <h4 className="font-bold text-sm text-slate-200 group-hover:text-white transition-colors">OKX Wallet</h4>
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-mono">OKX</span>
+                      <h4 className="font-bold text-sm text-slate-100 group-hover:text-white transition-colors">
+                        {t('wallet_okx')}
+                      </h4>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-slate-300 font-mono">
+                        OKX Web3
+                      </span>
                     </div>
-                    <p className="text-[11px] text-slate-400">{lang === 'en' ? 'OKX Web3 multi-chain extension' : 'Extension multi-chaînes OKX Web3'}</p>
+                    <p className="text-[11px] text-slate-400">{t('wallet_okx_sub')}</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono">
-                  EVM
-                </span>
+                {connectingWallet === 'okx' ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/10 text-slate-300 font-mono">
+                      EVM
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                )}
               </button>
 
-              {/* Option 2: MetaMask */}
+              {/* 2. MetaMask */}
               <button
                 onClick={() => connectWithProvider('metamask')}
-                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-amber-500/10 border border-surfaceBorder hover:border-amber-500/50 flex items-center justify-between transition-all group text-left"
+                disabled={connectingWallet !== null}
+                className="w-full p-3.5 rounded-2xl bg-slate-950/70 hover:bg-amber-500/10 border border-white/[0.08] hover:border-amber-500/50 flex items-center justify-between transition-all group text-left shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">
-                    🦊
+                  <div className="p-1 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-inner">
+                    <MetaMaskIcon className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-amber-300 transition-colors">MetaMask</h4>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm text-slate-100 group-hover:text-amber-300 transition-colors">
+                        {t('wallet_metamask')}
+                      </h4>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">
+                        {t('wallet_popular_badge')}
+                      </span>
+                    </div>
                     <p className="text-[11px] text-slate-400">{t('wallet_metamask_sub')}</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono">
-                  {t('recommended_badge')}
-                </span>
+                {connectingWallet === 'metamask' ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-mono">
+                      {t('recommended_badge')}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                )}
               </button>
 
-              {/* Option 3: Phantom */}
+              {/* 3. Phantom */}
               <button
                 onClick={() => connectWithProvider('phantom')}
-                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-purple-500/10 border border-surfaceBorder hover:border-purple-500/50 flex items-center justify-between transition-all group text-left"
+                disabled={connectingWallet !== null}
+                className="w-full p-3.5 rounded-2xl bg-slate-950/70 hover:bg-purple-500/10 border border-white/[0.08] hover:border-purple-500/50 flex items-center justify-between transition-all group text-left shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl">
-                    👻
+                  <div className="p-1 rounded-xl bg-purple-500/10 border border-purple-500/20 shadow-inner">
+                    <PhantomWalletIcon className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-purple-300 transition-colors">Phantom Wallet</h4>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm text-slate-100 group-hover:text-purple-300 transition-colors">
+                        {t('wallet_phantom')}
+                      </h4>
+                    </div>
                     <p className="text-[11px] text-slate-400">{t('wallet_phantom_sub')}</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-400 font-mono">
-                  EVM
-                </span>
+                {connectingWallet === 'phantom' ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-purple-400" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 font-mono">
+                      Multi-Chain
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                )}
               </button>
 
-              {/* Option 4: Other Web3 (Coinbase / Rabby / Brave) */}
+              {/* 4. Coinbase / Injected Web3 */}
               <button
                 onClick={() => connectWithProvider('injected')}
-                className="w-full p-3.5 rounded-2xl bg-surface/80 hover:bg-cyan-500/10 border border-surfaceBorder hover:border-cyan-500/50 flex items-center justify-between transition-all group text-left"
+                disabled={connectingWallet !== null}
+                className="w-full p-3.5 rounded-2xl bg-slate-950/70 hover:bg-blue-500/10 border border-white/[0.08] hover:border-blue-500/50 flex items-center justify-between transition-all group text-left shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xl">
-                    🌐
+                  <div className="p-1 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-inner">
+                    <CoinbaseWalletIcon className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-slate-200 group-hover:text-cyan-300 transition-colors">
-                      {lang === 'en' ? 'Other EVM Wallet' : 'Autre Portefeuille EVM'}
-                    </h4>
-                    <p className="text-[11px] text-slate-400">Rabby, Coinbase, Brave, Frame</p>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm text-slate-100 group-hover:text-blue-300 transition-colors">
+                        {t('wallet_coinbase')}
+                      </h4>
+                    </div>
+                    <p className="text-[11px] text-slate-400">{t('wallet_coinbase_sub')}</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 font-mono">
-                  Web3
-                </span>
+                {connectingWallet === 'injected' ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 font-mono">
+                      Web3
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-blue-300 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                )}
               </button>
 
-              {/* Option 5: Somnia 1-Click Demo */}
+              {/* 5. Somnia 1-Click Instant Demo */}
               <button
                 onClick={() => connectWithProvider('demo')}
-                className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/50 via-teal-950/40 to-slate-900 border border-cyan-500/40 hover:border-cyan-300 flex items-center justify-between transition-all group text-left shadow-sm"
+                className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-teal-950/30 to-slate-950 border border-cyan-500/40 hover:border-cyan-300 flex items-center justify-between transition-all group text-left shadow-lg shadow-cyan-950/20 active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xl">
+                  <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 text-lg shadow-inner">
                     ⚡
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-cyan-300 group-hover:text-cyan-200 transition-colors">{t('wallet_demo')}</h4>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm text-cyan-300 group-hover:text-cyan-200 transition-colors">
+                        {t('wallet_demo')}
+                      </h4>
+                    </div>
                     <p className="text-[11px] text-slate-400">{t('wallet_demo_sub')}</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono">
-                  {t('instant_badge')}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono">
+                    {t('instant_badge')}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                </div>
               </button>
             </div>
 
-            <p className="text-[11px] text-slate-500 text-center pt-1 font-mono">
-              Somnia Shannon Testnet • Chain ID: 50312
+            {/* Footer: Web3 Help & Faucet Access */}
+            <div className="pt-2 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
+              <button
+                onClick={() => {
+                  setShowWalletModal(false);
+                  setShowFaucetModal(true);
+                }}
+                className="hover:text-amber-300 flex items-center gap-1 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>{t('wallet_need_faucet_hint')}</span>
+              </button>
+
+              <a
+                href="https://ethereum.org/wallets/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cyan-300 flex items-center gap-1 transition-colors"
+              >
+                <span>{t('wallet_get_started')}</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            <p className="text-[10px] text-slate-500 text-center font-mono pt-1">
+              🔒 {t('wallet_disclaimer')}
             </p>
+
           </div>
         </div>
       )}
