@@ -117,6 +117,7 @@ export default function Home() {
   const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
   const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
   const [showContractsModal, setShowContractsModal] = useState<boolean>(false);
+  const [showFaucetModal, setShowFaucetModal] = useState<boolean>(false);
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
@@ -568,17 +569,15 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Official Somnia Faucet Link */}
-            <a
-              href="https://testnet.somnia.network/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm"
-              title="Obtenir des STT gratuits sur le Faucet Somnia"
+            {/* Somnia Faucet Modal Trigger */}
+            <button
+              onClick={() => setShowFaucetModal(true)}
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm active:scale-95"
+              title={lang === 'en' ? 'Get free STT tokens on Somnia Faucets' : 'Obtenir des STT gratuits sur les Faucets Somnia'}
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span className="hidden lg:inline">{t('faucet_btn')}</span>
-            </a>
+            </button>
 
             {/* On-Chain Contracts Button */}
             <button
@@ -1717,15 +1716,16 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="space-y-2 pt-2">
-              <a
-                href="https://testnet.somnia.network/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center gap-2 transition-all"
+              <button
+                onClick={() => {
+                  setShowAccountModal(false);
+                  setShowFaucetModal(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-98"
               >
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>{lang === 'en' ? 'Get STT tokens on Somnia Faucet' : 'Obtenir des jetons STT sur le Faucet'}</span>
-              </a>
+                <span>{lang === 'en' ? 'Get STT tokens on Somnia Faucets' : 'Obtenir des jetons STT sur les Faucets'}</span>
+              </button>
 
               <button
                 onClick={disconnectWallet}
@@ -2021,6 +2021,142 @@ export default function Home() {
                 Ouvrir Shannon Explorer ↗
               </a>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: SOMNIA SHANNON TESTNET FAUCETS */}
+      {showFaucetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="max-w-xl w-full bg-slate-900 border border-amber-500/40 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-6 text-slate-100 relative">
+            <button
+              onClick={() => setShowFaucetModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-[11px] font-mono text-amber-400 uppercase font-bold">
+                  Somnia Shannon Testnet • Chain ID: 50312
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <span>{t('faucet_modal_title')}</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                {t('faucet_modal_sub')}
+              </p>
+            </div>
+
+            {/* If wallet connected: Quick Copy Address Box */}
+            {walletConnected && walletAddressFull && (
+              <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-amber-500/30 flex items-center justify-between font-mono text-xs">
+                <div className="truncate mr-3">
+                  <span className="text-slate-400 text-[10px] block font-sans uppercase">{lang === 'en' ? 'Your Wallet Address:' : 'Votre Adresse Portefeuille :'}</span>
+                  <span className="text-amber-300 font-bold truncate block">{walletAddressFull}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(walletAddressFull);
+                    toast.success(lang === 'en' ? 'Address copied! Paste it in the faucet.' : 'Adresse copiée ! Collez-la dans le faucet.');
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-white border border-amber-500/40 text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 active:scale-95"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>{t('copy_my_address')}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Faucet Options List */}
+            <div className="space-y-3">
+              {/* Option 1: Google Cloud Web3 Faucet (Recommended) */}
+              <div className="p-4 rounded-2xl bg-slate-950/70 border border-amber-500/30 hover:border-amber-400/60 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-sm text-slate-100">{t('faucet_gcloud_title')}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">
+                      {t('faucet_rec_badge')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400">{t('faucet_gcloud_desc')}</p>
+                </div>
+                <a
+                  href="https://cloud.google.com/application/web3/faucet/somnia/shannon"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shrink-0 whitespace-nowrap active:scale-95"
+                >
+                  <span>{t('open_faucet_btn')}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* Option 2: Thirdweb Somnia Faucet */}
+              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-cyan-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-sm text-slate-100">{t('faucet_thirdweb_title')}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">
+                      {t('faucet_alt_badge')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400">{t('faucet_thirdweb_desc')}</p>
+                </div>
+                <a
+                  href="https://thirdweb.com/somnia-shannon-testnet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 hover:text-white border border-cyan-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shrink-0 whitespace-nowrap active:scale-95"
+                >
+                  <span>{t('open_faucet_btn')}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* Option 3: Stakely Multi-Faucet */}
+              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-purple-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-sm text-slate-100">{t('faucet_stakely_title')}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">
+                      {t('faucet_comm_badge')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400">{t('faucet_stakely_desc')}</p>
+                </div>
+                <a
+                  href="https://stakely.io/faucet/somnia-testnet-stt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 hover:text-white border border-purple-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shrink-0 whitespace-nowrap active:scale-95"
+                >
+                  <span>{t('open_faucet_btn')}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Developer Support Discord Callout */}
+            <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between gap-3 text-xs">
+              <div>
+                <span className="font-bold text-indigo-200 block">{t('faucet_discord_title')}</span>
+                <span className="text-slate-400 text-[11px] block">{t('faucet_discord_desc')}</span>
+              </div>
+              <a
+                href="https://discord.gg/somnia"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shrink-0 transition-all active:scale-95"
+              >
+                Discord ↗
+              </a>
+            </div>
+
           </div>
         </div>
       )}

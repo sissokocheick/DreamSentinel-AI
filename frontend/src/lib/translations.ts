@@ -178,7 +178,24 @@ export const translations = {
     deposit_modal_sub: 'Your USDso will be staked into the selected algorithmic copy-trading strategy.',
     confirm_deposit: 'Confirm On-Chain Deposit',
     cancel: 'Cancel',
-    amount_usdso: 'Amount in USDso'
+    amount_usdso: 'Amount in USDso',
+
+    // Faucet Modal
+    faucet_modal_title: 'Somnia Shannon Testnet Faucets',
+    faucet_modal_sub: 'Claim free STT tokens to pay gas fees and execute test prediction contracts on Somnia L1.',
+    faucet_rec_badge: 'Recommended • Fast & Verified',
+    faucet_alt_badge: 'Ecosystem Partner',
+    faucet_comm_badge: 'No Registration Required',
+    faucet_gcloud_title: 'Google Cloud Web3 Faucet',
+    faucet_gcloud_desc: 'Official Google Cloud faucet for Somnia Shannon. Drips STT directly into your EVM wallet.',
+    faucet_thirdweb_title: 'Thirdweb Somnia Faucet',
+    faucet_thirdweb_desc: 'Claim STT directly through the Thirdweb Somnia Shannon network portal.',
+    faucet_stakely_title: 'Stakely Multi-Faucet',
+    faucet_stakely_desc: 'Community faucet with captcha verification. No account or Google login required.',
+    faucet_discord_title: 'Somnia Developer Discord',
+    faucet_discord_desc: 'Tag DevRel (@emreyeth) in #dev-chat if you need large amounts of STT for stress testing.',
+    copy_my_address: 'Copy My Connected Address',
+    open_faucet_btn: 'Open Faucet'
   },
   fr: {
     // Header & Ticker
@@ -357,6 +374,23 @@ export const translations = {
     deposit_modal_sub: 'Vos USDso seront investis dans la stratégie de copy-trading algorithmique sélectionnée.',
     confirm_deposit: 'Confirmer le Dépôt On-Chain',
     cancel: 'Annuler',
-    amount_usdso: 'Montant en USDso'
+    amount_usdso: 'Montant en USDso',
+
+    // Faucet Modal
+    faucet_modal_title: 'Faucets Testnet Somnia Shannon',
+    faucet_modal_sub: 'Obtenez des jetons STT gratuits pour payer les frais de gaz et tester les contrats sur Somnia L1.',
+    faucet_rec_badge: 'Recommandé • Rapide & Vérifié',
+    faucet_alt_badge: 'Partenaire Écosystème',
+    faucet_comm_badge: 'Sans Inscription Requise',
+    faucet_gcloud_title: 'Google Cloud Web3 Faucet',
+    faucet_gcloud_desc: 'Faucet officiel Google Cloud pour Somnia Shannon. Envoie directement des STT à votre adresse EVM.',
+    faucet_thirdweb_title: 'Faucet Thirdweb Somnia',
+    faucet_thirdweb_desc: 'Réclamez vos STT directement depuis le portail réseau Thirdweb pour Somnia Shannon.',
+    faucet_stakely_title: 'Multi-Faucet Stakely',
+    faucet_stakely_desc: 'Faucet communautaire avec simple captcha. Ne nécessite aucun compte ni connexion Google.',
+    faucet_discord_title: 'Discord Développeur Somnia',
+    faucet_discord_desc: 'Contactez l\'équipe DevRel (@emreyeth) dans #dev-chat si vous avez besoin de gros volumes de STT.',
+    copy_my_address: 'Copier Mon Adresse Connectée',
+    open_faucet_btn: 'Ouvrir le Faucet'
   }
 };
