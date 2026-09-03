@@ -247,6 +247,17 @@ export default function Home() {
     }
   };
 
+  // Check URL query parameters for tab routing (e.g. ?tab=swarm)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam && ['terminal', 'swarm', 'copilot', 'scanner', 'backtest', 'pvp', 'vaults', 'leaderboard'].includes(tabParam)) {
+        setActiveTab(tabParam as any);
+      }
+    }
+  }, []);
+
   // EIP-6963 Multi-Wallet Provider Storage
   const [eip6963Wallets, setEip6963Wallets] = useState<any[]>([]);
 
