@@ -517,7 +517,8 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background text-slate-100">
       
       {/* Top Banner: Somnia Hackathon Header */}
-      <header className="border-b border-surfaceBorder bg-surface/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-surfaceBorder bg-surface/90 backdrop-blur-md sticky top-0 z-50 shadow-md">
+        {/* ROW 1: Logo & Branding on Left, Web3 Wallet Cluster & Disconnect on Right */}
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           
           {/* LEFT: Logo & Branding */}
@@ -537,37 +538,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* CENTER: Navigation Tabs (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1 bg-surfaceBorder/40 p-1 rounded-xl border border-surfaceBorder">
-            {[
-              { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
-              { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
-              { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare },
-              { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap },
-              { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp },
-              { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords },
-              { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers },
-              { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award },
-            ].map(tab => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                    isActive 
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm' 
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-surfaceBorder/50'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {t(tab.labelKey)}
-                </button>
-              );
-            })}
-          </nav>
 
           {/* RIGHT: Web3 Status, Language, Faucet, Contracts & Wallet */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
@@ -602,11 +572,11 @@ export default function Home() {
               href="https://testnet.somnia.network/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm"
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm"
               title="Obtenir des STT gratuits sur le Faucet Somnia"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{t('faucet_btn')}</span>
+              <span className="hidden lg:inline">{t('faucet_btn')}</span>
             </a>
 
             {/* On-Chain Contracts Button */}
@@ -616,7 +586,7 @@ export default function Home() {
               title="Afficher les contrats déployés sur Somnia Shannon Testnet"
             >
               <LinkIcon className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden xl:inline">{t('onchain_contracts_btn')}</span>
+              <span className="hidden lg:inline">{t('onchain_contracts_btn')}</span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">4</span>
             </button>
 
@@ -626,7 +596,7 @@ export default function Home() {
               <span>Somnia (50312)</span>
             </div>
 
-            {/* WALLET BUTTON OR ACCOUNT PILL (Polymarket / Uniswap style) */}
+            {/* WALLET BUTTON OR ACCOUNT PILL + DISCONNECT BUTTON */}
             {walletConnected ? (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm">
@@ -655,11 +625,11 @@ export default function Home() {
                 {/* Highly Visible Dedicated Disconnect Button */}
                 <button
                   onClick={disconnectWallet}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 hover:border-rose-500/60 text-rose-300 hover:text-rose-100 text-xs font-bold transition-all shadow-sm active:scale-95 shrink-0"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/50 hover:border-rose-400 text-rose-300 hover:text-white text-xs font-black transition-all shadow-md shadow-rose-500/10 active:scale-95 shrink-0"
                   title={lang === 'en' ? 'Disconnect wallet' : 'Déconnecter le portefeuille'}
                 >
                   <LogOut className="w-3.5 h-3.5 text-rose-400" />
-                  <span className="text-[11px] font-bold">{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
+                  <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
                 </button>
               </div>
             ) : (
@@ -675,35 +645,37 @@ export default function Home() {
 
         </div>
 
-        {/* Mobile / Tablet Horizontal Navigation Bar (< lg) */}
-        <div className="lg:hidden px-4 py-2 border-t border-surfaceBorder/40 overflow-x-auto flex items-center gap-1 bg-surface/50">
-          {[
-            { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
-            { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
-            { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare },
-            { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap },
-            { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp },
-            { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords },
-            { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers },
-            { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award },
-          ].map(tab => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                  isActive 
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm' 
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {t(tab.labelKey)}
-              </button>
-            );
-          })}
+        {/* ROW 2: Dedicated Full Navigation Bar with all 8 tabs for all screens */}
+        <div className="border-t border-surfaceBorder/50 bg-slate-950/50 px-4 py-2">
+          <div className="max-w-7xl mx-auto overflow-x-auto flex items-center gap-1.5 scrollbar-none">
+            {[
+              { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
+              { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
+              { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare },
+              { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap },
+              { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp },
+              { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords },
+              { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers },
+              { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award },
+            ].map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                    isActive 
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm font-bold' 
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-surfaceBorder/50'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {t(tab.labelKey)}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </header>
 
@@ -749,6 +721,21 @@ export default function Home() {
               0xE1B0...41D <ExternalLink className="w-3 h-3" />
             </a>
           </div>
+
+          {/* Quick Disconnect shortcut in ticker ribbon if connected */}
+          {walletConnected && (
+            <div className="flex items-center gap-2 pl-4 border-l border-white/10 shrink-0">
+              <span className="text-emerald-400 font-bold">🟢 {walletAddress}</span>
+              <button
+                onClick={disconnectWallet}
+                className="text-rose-400 hover:text-rose-200 font-bold underline flex items-center gap-1 text-[11px] cursor-pointer"
+                title={lang === 'en' ? 'Disconnect wallet' : 'Déconnecter le portefeuille'}
+              >
+                <LogOut className="w-3 h-3" />
+                <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1064,6 +1051,41 @@ export default function Home() {
                     DreamDEX CLOB
                   </span>
                 </div>
+
+                {/* Active Wallet Badge & Disconnect inside the Order Ticket */}
+                {walletConnected ? (
+                  <div className="mb-4 p-3 rounded-2xl bg-slate-900/90 border border-cyan-500/30 flex items-center justify-between font-mono text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <div>
+                        <div className="text-[10px] text-slate-400 font-sans font-bold uppercase tracking-wider">{lang === 'en' ? 'Active Wallet' : 'Portefeuille Connecté'}</div>
+                        <div className="text-cyan-300 font-bold">{walletAddress}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={disconnectWallet}
+                      className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/50 hover:border-rose-400 text-rose-300 hover:text-white text-xs font-black transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+                      title={lang === 'en' ? 'Disconnect wallet' : 'Déconnecter ce portefeuille'}
+                    >
+                      <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                      <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-4 p-3 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-slate-500" />
+                      <span className="text-slate-300 font-medium">{lang === 'en' ? 'Wallet not connected' : 'Portefeuille non connecté'}</span>
+                    </div>
+                    <button
+                      onClick={handleConnectWallet}
+                      className="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all text-xs flex items-center gap-1.5 shadow-sm active:scale-95"
+                    >
+                      <Wallet className="w-3.5 h-3.5" />
+                      <span>{lang === 'en' ? 'Connect' : 'Connecter'}</span>
+                    </button>
+                  </div>
+                )}
 
                 {/* Outcome Toggle Buttons */}
                 <div className="grid grid-cols-2 gap-3 mb-5">
