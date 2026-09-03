@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, Pause, RotateCcw, Volume2, VolumeX, Maximize, 
   ChevronRight, Bot, Zap, Swords, Shield, AlertTriangle, 
-  TrendingUp, Check, ExternalLink, Sparkles 
+  TrendingUp, Check, ExternalLink, Sparkles, Download, Mic 
 } from 'lucide-react';
 import { Language } from '../lib/translations';
 
@@ -25,37 +25,39 @@ interface Chapter {
 }
 
 const CHAPTERS: Chapter[] = [
-  { id: 1, start: 0, end: 35, titleEn: '1. The Problem & Vision', titleFr: '1. Problème & Vision', icon: AlertTriangle },
-  { id: 2, start: 35, end: 75, titleEn: '2. Bayesian AI Swarm', titleFr: '2. Essaim d\'IA Bayésien', icon: Bot },
-  { id: 3, start: 75, end: 115, titleEn: '3. Execution on Somnia L1', titleFr: '3. Exécution Somnia L1', icon: Zap },
-  { id: 4, start: 115, end: 155, titleEn: '4. Radar & 60s PvP Duels', titleFr: '4. Radar & Duels PvP 60s', icon: Swords },
-  { id: 5, start: 155, end: 180, titleEn: '5. On-Chain Contracts', titleFr: '5. Contrats On-Chain', icon: Shield },
+  { id: 1, start: 0, end: 28, titleEn: '1. The Problem & Vision', titleFr: '1. Problème & Vision', icon: AlertTriangle },
+  { id: 2, start: 28, end: 58, titleEn: '2. Bayesian AI Swarm', titleFr: '2. Essaim d\'IA Bayésien', icon: Bot },
+  { id: 3, start: 58, end: 85, titleEn: '3. Execution on Somnia L1', titleFr: '3. Exécution Somnia L1', icon: Zap },
+  { id: 4, start: 85, end: 110, titleEn: '4. Radar & 60s PvP Duels', titleFr: '4. Radar & Duels PvP 60s', icon: Swords },
+  { id: 5, start: 110, end: 135, titleEn: '5. On-Chain Contracts', titleFr: '5. Contrats On-Chain', icon: Shield },
 ];
 
 const SUBTITLES_EN: { start: number; end: number; text: string }[] = [
   { start: 0, end: 8, text: "Welcome to DreamSentinel AI — Autonomous Swarm Intelligence for DreamDEX on Somnia Layer 1." },
   { start: 8, end: 18, text: "Prediction markets face 3 critical bottlenecks: fragmented liquidity, slow latency, and human emotional sizing errors." },
-  { start: 18, end: 35, text: "DreamSentinel AI solves this by fusing Bayesian probability models, Kelly Criterion, and Somnia's 105k TPS." },
-  { start: 35, end: 55, text: "Meet our Autonomous Agent Swarm: Alpha Scalper detects microsecond Order Book Imbalances (OBI) on DreamDEX CLOB." },
-  { start: 55, end: 75, text: "Bayesian Arb calculates exact event odds via Pyth and sizes positions mathematically with Kelly: f* = (bp - q) / b." },
-  { start: 75, end: 95, text: "Macro Hedger guards portfolio value against sudden volatility shocks. Every hypothesis is streamed live in Chain-of-Thought." },
-  { start: 95, end: 115, text: "In our Trading Terminal, winning shares settle at exactly $1.00 USDso. Payouts and returns calculate in real-time." },
-  { start: 115, end: 135, text: "Natural language AI Copilot generates actionable trade cards ready for single-click non-custodial execution." },
-  { start: 135, end: 155, text: "Our Arbitrage Radar identifies mispricings between DreamDEX and Polymarket, while PvPDuelEscrow powers 60s binary duels." },
-  { start: 155, end: 180, text: "ERC-4626 Vaults automate passive yield. All contracts are verified on Somnia Shannon Testnet (Chain ID 50312)!" },
+  { start: 18, end: 28, text: "DreamSentinel AI solves this by fusing Bayesian probability models, Kelly Criterion, and Somnia's 105k TPS." },
+  { start: 28, end: 40, text: "Meet our Autonomous Agent Swarm: Alpha Scalper detects microsecond Order Book Imbalances on DreamDEX CLOB." },
+  { start: 40, end: 50, text: "Bayesian Arb calculates exact event odds via Pyth and sizes positions mathematically with Kelly: f* = (bp - q) / b." },
+  { start: 50, end: 58, text: "Macro Hedger guards portfolio value against sudden volatility shocks. Every hypothesis is streamed live in Chain-of-Thought." },
+  { start: 58, end: 72, text: "In our Trading Terminal, winning shares settle at exactly $1.00 USDso. Payouts and returns calculate in real-time." },
+  { start: 72, end: 85, text: "Natural language AI Copilot generates actionable trade cards ready for single-click non-custodial execution." },
+  { start: 85, end: 98, text: "Our Arbitrage Radar identifies mispricings between DreamDEX and Polymarket, while PvPDuelEscrow powers 60s binary duels." },
+  { start: 98, end: 110, text: "ERC-4626 Vaults automate passive yield. All contracts are verified on Somnia Shannon Testnet (Chain ID 50312)!" },
+  { start: 110, end: 135, text: "DreamSentinel AI brings institutional quantitative intelligence to on-chain prediction markets. Thank you for watching!" }
 ];
 
 const SUBTITLES_FR: { start: number; end: number; text: string }[] = [
   { start: 0, end: 8, text: "Bienvenue sur DreamSentinel AI — L'infrastructure d'essaim d'agents IA pour DreamDEX sur la L1 Somnia." },
   { start: 8, end: 18, text: "Les marchés de prédiction souffrent de 3 écueils : carnets d'ordres fragmentés, forte latence et biais émotionnel humain." },
-  { start: 18, end: 35, text: "DreamSentinel résout ces défis en fusionnant modèles bayésiens, critère de Kelly et les 105 000 TPS de Somnia." },
-  { start: 35, end: 55, text: "Découvrez notre essaim autonome : Alpha Scalper analyse les déséquilibres du carnet d'ordres (OBI) en microsecondes." },
-  { start: 55, end: 75, text: "Bayesian Arb calcule les probabilités réelles via Pyth et optimise le sizing avec le critère mathématique de Kelly." },
-  { start: 75, end: 95, text: "Macro Hedger protège le portefeuille contre les chocs de volatilité. Chaque étape de pensée est transparente." },
-  { start: 95, end: 115, text: "Dans le Terminal, chaque part gagnante règle à 1,00 $ USDso. Les gains et rendements sont calculés en temps réel." },
-  { start: 115, end: 135, text: "Le Copilot IA conversationnel génère des ordres prêts à être exécutés en un seul clic sur Somnia." },
-  { start: 135, end: 155, text: "Le Radar d'Arbitrage exploite les écarts DreamDEX vs Polymarket, tandis que PvPDuelEscrow régit les duels 60s." },
-  { start: 155, end: 180, text: "Les Vaults ERC-4626 automatisent le copy-trading. Tous les contrats sont vérifiés sur Somnia Shannon (50312) !" },
+  { start: 18, end: 28, text: "DreamSentinel résout ces défis en fusionnant modèles bayésiens, critère de Kelly et les 105 000 TPS de Somnia." },
+  { start: 28, end: 40, text: "Découvrez notre essaim autonome : Alpha Scalper analyse les déséquilibres du carnet d'ordres (OBI) en microsecondes." },
+  { start: 40, end: 50, text: "Bayesian Arb calcule les probabilités réelles via Pyth et optimise le sizing avec le critère mathématique de Kelly." },
+  { start: 50, end: 58, text: "Macro Hedger protège le portefeuille contre les chocs de volatilité. Chaque étape de pensée est transparente." },
+  { start: 58, end: 72, text: "Dans le Terminal, chaque part gagnante règle à 1,00 $ USDso. Les gains et rendements sont calculés en temps réel." },
+  { start: 72, end: 85, text: "Le Copilot IA conversationnel génère des ordres prêts à être exécutés en un seul clic sur Somnia." },
+  { start: 85, end: 98, text: "Le Radar d'Arbitrage exploite les écarts DreamDEX vs Polymarket, tandis que PvPDuelEscrow régit les duels 60s." },
+  { start: 98, end: 110, text: "Les Vaults ERC-4626 automatisent le copy-trading. Tous les contrats sont vérifiés sur Somnia Shannon (50312) !" },
+  { start: 110, end: 135, text: "DreamSentinel AI apporte la finance quantitative aux marchés de prédiction sur Somnia. Merci beaucoup !" }
 ];
 
 export const InteractiveVideoPlayer: React.FC<Props> = ({
@@ -67,48 +69,50 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [showSubtitles, setShowSubtitles] = useState<boolean>(true);
   const [videoMode, setVideoMode] = useState<'interactive' | 'external'>(
     customVideoUrl ? 'external' : 'interactive'
   );
   const [urlInput, setUrlInput] = useState<string>(customVideoUrl || '');
+  const [duration, setDuration] = useState<number>(120);
 
-  const totalDuration = 180; // 3:00 minutes
-  const animFrameRef = useRef<number | null>(null);
-  const lastTimeRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceSrc = lang === 'fr' ? '/voiceover_fr.mp3' : '/voiceover_en.mp3';
 
-  // Playback timer loop
-  useEffect(() => {
-    if (!isPlaying) {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      lastTimeRef.current = null;
-      return;
+  // Handle audio timeupdate to sync currentTime
+  const handleAudioTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
     }
+  };
 
-    const step = (timestamp: number) => {
-      if (!lastTimeRef.current) lastTimeRef.current = timestamp;
-      const delta = (timestamp - lastTimeRef.current) / 1000;
-      lastTimeRef.current = timestamp;
+  // Handle audio loaded metadata for duration
+  const handleAudioLoadedMetadata = () => {
+    if (audioRef.current && !isNaN(audioRef.current.duration)) {
+      setDuration(audioRef.current.duration);
+    }
+  };
 
-      setCurrentTime(prev => {
-        const next = prev + delta * playbackSpeed;
-        if (next >= totalDuration) {
-          setIsPlaying(false);
-          return totalDuration;
-        }
-        return next;
-      });
+  // Handle audio ended
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (audioRef.current) audioRef.current.currentTime = 0;
+  };
 
-      animFrameRef.current = requestAnimationFrame(step);
-    };
+  // Synchronize audio state with playback controls
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.playbackRate = playbackSpeed;
+    audioRef.current.muted = isMuted;
 
-    animFrameRef.current = requestAnimationFrame(step);
-
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [isPlaying, playbackSpeed]);
+    if (isPlaying) {
+      audioRef.current.play().catch(e => console.warn('Audio play error:', e));
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, playbackSpeed, isMuted, voiceSrc]);
 
   // Format time mm:ss
   const formatTime = (secs: number) => {
@@ -128,17 +132,33 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = Number(e.target.value);
     setCurrentTime(val);
+    if (audioRef.current) {
+      audioRef.current.currentTime = val;
+    }
   };
 
   // Jump to chapter
   const jumpToChapter = (start: number) => {
     setCurrentTime(start);
+    if (audioRef.current) {
+      audioRef.current.currentTime = start;
+    }
     setIsPlaying(true);
   };
 
   return (
     <div className="w-full space-y-4">
       
+      {/* Hidden Audio Element for AI Studio Voiceover */}
+      <audio
+        ref={audioRef}
+        src={voiceSrc}
+        onTimeUpdate={handleAudioTimeUpdate}
+        onLoadedMetadata={handleAudioLoadedMetadata}
+        onEnded={handleAudioEnded}
+        preload="auto"
+      />
+
       {/* Mode Selector Toggle: Interactive 60fps Demo vs External Video (Loom/YouTube) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-2 rounded-2xl bg-slate-950/70 border border-white/[0.08]">
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-white/10 text-xs">
@@ -151,7 +171,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>{lang === 'en' ? 'Interactive Simulated Demo (60 FPS)' : 'Démo Vidéo Interactive (60 FPS)'}</span>
+            <span>{lang === 'en' ? 'Interactive Demo (60 FPS)' : 'Démo Vidéo Interactive (60 FPS)'}</span>
           </button>
           <button
             onClick={() => setVideoMode('external')}
@@ -166,9 +186,21 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
           </button>
         </div>
 
-        <div className="text-[11px] font-mono text-cyan-400 flex items-center gap-1.5 px-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span>Somnia Shannon Testnet • 105,420 TPS</span>
+        {/* AI Voice Badge & Download Link */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-500/10 border border-purple-500/30 text-[11px] font-mono text-purple-300">
+            <Mic className="w-3 h-3 text-purple-400 animate-pulse" />
+            <span>{lang === 'en' ? 'Studio AI Voice (US English)' : 'Voix IA Studio (Français)'}</span>
+          </div>
+          <a
+            href={voiceSrc}
+            download={`dream_sentinel_${lang}_voiceover.mp3`}
+            className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white flex items-center gap-1 transition-all text-xs"
+            title={lang === 'en' ? 'Download Voiceover MP3' : 'Télécharger le fichier Audio MP3'}
+          >
+            <Download className="w-3 h-3 text-cyan-400" />
+            <span className="text-[10px] font-mono">MP3</span>
+          </a>
         </div>
       </div>
 
@@ -186,7 +218,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
             </div>
             <div className="flex items-center gap-2 text-[11px] font-mono text-slate-300">
               <span className="px-2 py-0.5 rounded-full bg-white/10 border border-white/20">
-                {formatTime(currentTime)} / {formatTime(totalDuration)}
+                {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
           </div>
@@ -197,8 +229,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
             {/* Ambient Animated Glow */}
             <div className="absolute inset-0 bg-radial from-purple-900/20 via-slate-950/80 to-slate-950 pointer-events-none" />
 
-            {/* SCENE 1: (0 - 35s) THE PROBLEM & VISION */}
-            {currentTime >= 0 && currentTime < 35 && (
+            {/* SCENE 1: (0 - 28s) THE PROBLEM & VISION */}
+            {currentTime >= 0 && currentTime < 28 && (
               <div className="relative z-10 max-w-lg w-full text-center space-y-4 animate-in fade-in zoom-in-95 duration-500">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-bold">
                   <AlertTriangle className="w-3.5 h-3.5" />
@@ -224,8 +256,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
               </div>
             )}
 
-            {/* SCENE 2: (35 - 75s) BAYESIAN SWARM INTELLIGENCE */}
-            {currentTime >= 35 && currentTime < 75 && (
+            {/* SCENE 2: (28 - 58s) BAYESIAN SWARM INTELLIGENCE */}
+            {currentTime >= 28 && currentTime < 58 && (
               <div className="relative z-10 max-w-lg w-full space-y-3 animate-in fade-in duration-500">
                 <div className="flex items-center justify-between">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-bold">
@@ -263,8 +295,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
               </div>
             )}
 
-            {/* SCENE 3: (75 - 115s) HIGH-FREQUENCY SOMNIA L1 EXECUTION */}
-            {currentTime >= 75 && currentTime < 115 && (
+            {/* SCENE 3: (58 - 85s) HIGH-FREQUENCY SOMNIA L1 EXECUTION */}
+            {currentTime >= 58 && currentTime < 85 && (
               <div className="relative z-10 max-w-lg w-full space-y-3 animate-in fade-in duration-500">
                 <div className="flex items-center justify-between">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
@@ -291,8 +323,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
               </div>
             )}
 
-            {/* SCENE 4: (115 - 155s) ARBITRAGE RADAR & 60S PVP DUELS */}
-            {currentTime >= 115 && currentTime < 155 && (
+            {/* SCENE 4: (85 - 110s) ARBITRAGE RADAR & 60S PVP DUELS */}
+            {currentTime >= 85 && currentTime < 110 && (
               <div className="relative z-10 max-w-lg w-full space-y-3 animate-in fade-in duration-500">
                 <div className="flex items-center justify-between">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold">
@@ -317,8 +349,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
               </div>
             )}
 
-            {/* SCENE 5: (155 - 180s) VERIFIED ON-CHAIN CONTRACTS */}
-            {currentTime >= 155 && (
+            {/* SCENE 5: (110 - 135s) VERIFIED ON-CHAIN CONTRACTS */}
+            {currentTime >= 110 && (
               <div className="relative z-10 max-w-lg w-full space-y-3 animate-in fade-in duration-500">
                 <div className="text-center space-y-1">
                   <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
@@ -353,13 +385,16 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
             {!isPlaying && (
               <div 
                 onClick={() => setIsPlaying(true)}
-                className="absolute inset-0 bg-black/50 backdrop-blur-xs flex flex-col items-center justify-center cursor-pointer z-20 group"
+                className="absolute inset-0 bg-black/55 backdrop-blur-xs flex flex-col items-center justify-center cursor-pointer z-20 group"
               >
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-2xl shadow-purple-500/50 group-hover:scale-110 transition-transform">
                   <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white fill-white translate-x-1" />
                 </div>
                 <span className="mt-3 text-xs sm:text-sm font-bold text-white group-hover:text-purple-300 transition-colors">
-                  {lang === 'en' ? 'Click to Play Video Demo' : 'Cliquez pour Lancer la Démo Vidéo'}
+                  {lang === 'en' ? 'Click to Play Video Demo (With Studio Voice)' : 'Cliquez pour Écouter et Lancer la Démo Vidéo'}
+                </span>
+                <span className="text-[11px] text-slate-400 mt-1 font-mono">
+                  {lang === 'en' ? 'Auto-narrated with US English Voice' : 'Voix-off narrative IA en Français'}
                 </span>
               </div>
             )}
@@ -367,7 +402,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
 
           {/* Subtitles Overlay Bar */}
           {showSubtitles && currentSubtitle && (
-            <div className="px-4 py-2 bg-black/85 backdrop-blur-md border-t border-b border-white/10 text-center z-10 animate-in fade-in duration-150">
+            <div className="px-4 py-2.5 bg-black/90 backdrop-blur-md border-t border-b border-white/10 text-center z-10 animate-in fade-in duration-150">
               <p className="text-xs sm:text-sm text-yellow-300 font-medium tracking-wide">
                 "{currentSubtitle}"
               </p>
@@ -382,7 +417,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
               <input
                 type="range"
                 min={0}
-                max={totalDuration}
+                max={duration || 120}
                 step={0.5}
                 value={currentTime}
                 onChange={handleSeek}
@@ -404,6 +439,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
                 <button
                   onClick={() => {
                     setCurrentTime(0);
+                    if (audioRef.current) audioRef.current.currentTime = 0;
                     setIsPlaying(true);
                   }}
                   className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all"
@@ -412,12 +448,23 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
                   <RotateCcw className="w-3.5 h-3.5" />
                 </button>
 
+                {/* Volume Mute / Unmute Button */}
+                <button
+                  onClick={() => setIsMuted(!isMuted)}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    isMuted ? 'bg-rose-500/20 text-rose-300' : 'bg-white/10 hover:bg-white/20 text-white'
+                  }`}
+                  title={isMuted ? 'Unmute AI Voice' : 'Mute Voice'}
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+                </button>
+
                 <div className="font-mono text-slate-400 text-[11px]">
-                  <span className="text-white font-bold">{formatTime(currentTime)}</span> / {formatTime(totalDuration)}
+                  <span className="text-white font-bold">{formatTime(currentTime)}</span> / {formatTime(duration)}
                 </div>
               </div>
 
-              {/* Right Controls: Subtitles, Speed, Audio */}
+              {/* Right Controls: Subtitles, Speed */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowSubtitles(!showSubtitles)}
@@ -430,7 +477,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
                 </button>
 
                 <button
-                  onClick={() => setPlaybackSpeed(s => s === 1 ? 1.5 : s === 1.5 ? 2 : 1)}
+                  onClick={() => setPlaybackSpeed(s => s === 1 ? 1.25 : s === 1.25 ? 1.5 : 1)}
                   className="px-2 py-1 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 text-[10px] font-mono font-bold"
                   title="Playback Speed"
                 >
