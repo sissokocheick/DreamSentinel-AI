@@ -205,7 +205,29 @@ export const translations = {
     faucet_discord_title: 'Somnia Developer Discord',
     faucet_discord_desc: 'Tag DevRel (@emreyeth) in #dev-chat if you need large amounts of STT for stress testing.',
     copy_my_address: 'Copy My Connected Address',
-    open_faucet_btn: 'Open Faucet'
+    open_faucet_btn: 'Open Faucet',
+
+    // Video Demo Modal
+    video_btn: 'Video Demo',
+    video_banner_btn: '🎬 Watch Explainer Video',
+    video_modal_title: 'DreamSentinel AI — Video Walkthrough & Interactive Demo',
+    video_modal_sub: 'Discover how Autonomous Bayesian AI Agents & High-Frequency Somnia L1 revolutionize prediction markets.',
+    video_tab_player: '🎬 Video Presentation',
+    video_tab_storyboard: '💡 Interactive Pitch & Pillars',
+    video_step_1_title: 'The Problem: Prediction Market Inefficiencies',
+    video_step_1_desc: 'Traditional prediction markets suffer from fragmented order books, high latency, illiquidity, and emotional sizing errors.',
+    video_step_2_title: 'The Innovation: Autonomous Bayesian Swarm',
+    video_step_2_desc: 'DreamSentinel deploys 3 specialized agents: Alpha Scalper (HFT), Bayesian Arb (Kelly Sizing), and Macro Hedger on Somnia Reactive L1.',
+    video_step_3_title: 'Somnia Shannon: 105,420 TPS & Sub-Second Finality',
+    video_step_3_desc: 'Sub-300ms execution with < 0.0001 STT gas allows instant arbitrage between DreamDEX CLOB and Polymarket without frontrunning.',
+    video_step_4_title: 'Micro-Duels & ERC-4626 Algorithmic Vaults',
+    video_step_4_desc: 'Smart Escrow PvPDuelEscrow.sol enables 60-second binary wagers, while DreamSentinelVault.sol automates copy-trading deposits.',
+    video_step_5_title: 'Verified On-Chain Architecture',
+    video_step_5_desc: 'All smart contracts, oracles, and escrows are verified and deployed on Somnia Shannon Testnet (Chain ID 50312).',
+    video_enter_url: 'Custom Video URL (YouTube, Loom, or MP4):',
+    video_save_url: 'Update Video',
+    video_default_note: 'Official Somnia x DreamDEX Hackathon Demo Walkthrough',
+    video_try_feature: 'Test This Feature Live In App'
   },
   fr: {
     // Header & Ticker
@@ -411,6 +433,28 @@ export const translations = {
     faucet_discord_title: 'Discord Développeur Somnia',
     faucet_discord_desc: 'Contactez l\'équipe DevRel (@emreyeth) dans #dev-chat si vous avez besoin de gros volumes de STT.',
     copy_my_address: 'Copier Mon Adresse Connectée',
-    open_faucet_btn: 'Ouvrir le Faucet'
+    open_faucet_btn: 'Ouvrir le Faucet',
+
+    // Video Demo Modal
+    video_btn: 'Vidéo Démo',
+    video_banner_btn: '🎬 Voir la Vidéo Explicative',
+    video_modal_title: 'DreamSentinel AI — Démonstration Vidéo & Pitch Interactif',
+    video_modal_sub: 'Découvrez comment les Agents IA Bayésiens et la L1 Somnia transforment les marchés de prédiction.',
+    video_tab_player: '🎬 Vidéo de Présentation',
+    video_tab_storyboard: '💡 Pitch Interactif & Piliers',
+    video_step_1_title: 'Le Problème : Les Inefficiences des Marchés de Prédiction',
+    video_step_1_desc: 'Les marchés de prédiction souffrent de carnets d\'ordres fragmentés, de forte latence, d\'illiquidité et d\'erreurs de sizing humain.',
+    video_step_2_title: 'L\'Innovation : Essaim d\'IA Bayésien Autonome',
+    video_step_2_desc: 'DreamSentinel déploie 3 agents spécialisés : Alpha Scalper (HFT), Bayesian Arb (Critère de Kelly), et Macro Hedger sur Somnia L1.',
+    video_step_3_title: 'Somnia Shannon : 105 420 TPS & Finalité Sub-Seconde',
+    video_step_3_desc: 'Une exécution en moins de 300ms avec un gas < 0.0001 STT permet des arbitrages instantanés entre DreamDEX CLOB et Polymarket.',
+    video_step_4_title: 'Micro-Duels & Vaults Algorithmiques ERC-4626',
+    video_step_4_desc: 'PvPDuelEscrow.sol gère des duels binaires en 60 secondes, tandis que DreamSentinelVault.sol automatise les dépôts de copy-trading.',
+    video_step_5_title: 'Architecture On-Chain Vérifiée',
+    video_step_5_desc: 'Tous les contrats intelligents, oracles et séquestres sont vérifiés et déployés sur le Testnet Somnia Shannon (Chain ID 50312).',
+    video_enter_url: 'URL de votre vidéo (YouTube, Loom, ou MP4) :',
+    video_save_url: 'Mettre à jour la vidéo',
+    video_default_note: 'Présentation officielle pour le Hackathon Somnia x DreamDEX',
+    video_try_feature: 'Tester cette fonctionnalité en direct'
   }
 };

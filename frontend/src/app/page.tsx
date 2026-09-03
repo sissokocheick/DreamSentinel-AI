@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, Cpu, Zap, Shield, Bot, LineChart, 
   Wallet, Award, Activity, ArrowUpRight, Sparkles, MessageSquare, 
   Layers, CheckCircle, AlertTriangle, RefreshCw, Send, Check, ChevronRight, DollarSign, Swords,
-  ExternalLink, Copy, X, Link as LinkIcon, LogOut
+  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft
 } from 'lucide-react';
 import { Market, AgentProfile, ThoughtLog, SwarmStatus, ActionCard, CopilotMessage } from '../types';
 import { fetchMarkets, fetchAgents, sendCopilotMessage, executeTrade, getFallbackMarkets, getFallbackSwarmStatus } from '../lib/api';
@@ -171,10 +171,29 @@ export default function Home() {
   const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
   const [showContractsModal, setShowContractsModal] = useState<boolean>(false);
   const [showFaucetModal, setShowFaucetModal] = useState<boolean>(false);
+  const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
+  const [videoActiveStep, setVideoActiveStep] = useState<number>(0);
+  const [customVideoUrl, setCustomVideoUrl] = useState<string>('');
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
+
+  // Load saved video URL from localStorage if any
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dreamsentinel_video_url');
+      if (saved) setCustomVideoUrl(saved);
+    }
+  }, []);
+
+  const handleSaveVideoUrl = (url: string) => {
+    setCustomVideoUrl(url);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dreamsentinel_video_url', url);
+    }
+    toast.success(lang === 'en' ? 'Video link updated!' : 'Lien vidéo mis à jour !');
+  };
 
   // Connect Wallet: open selector
   const handleConnectWallet = () => {
@@ -632,6 +651,16 @@ export default function Home() {
               </button>
             </div>
 
+            {/* Somnia Video Demo Modal Trigger */}
+            <button
+              onClick={() => setShowVideoModal(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-xs text-purple-200 font-bold transition-all shadow-sm active:scale-95 group"
+              title={lang === 'en' ? 'Watch Video Walkthrough & Interactive Demo' : 'Voir la Démonstration Vidéo et le Pitch'}
+            >
+              <Film className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
+              <span>{t('video_btn')}</span>
+            </button>
+
             {/* Somnia Faucet Modal Trigger */}
             <button
               onClick={() => setShowFaucetModal(true)}
@@ -820,12 +849,21 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setShowHowItWorks(false)}
-                className="text-xs text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 transition-colors shrink-0"
-              >
-                ✕ {t('hide_guide')}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowVideoModal(true)}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                >
+                  <Play className="w-3 h-3 text-purple-400 fill-purple-400" />
+                  <span>{t('video_banner_btn')}</span>
+                </button>
+                <button
+                  onClick={() => setShowHowItWorks(false)}
+                  className="text-xs text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 transition-colors shrink-0"
+                >
+                  ✕ {t('hide_guide')}
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
@@ -2422,6 +2460,349 @@ export default function Home() {
                 <span>Confirmer le Dépôt de ${depositAmount} USDso</span>
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 5: VIDEO WALKTHROUGH & INTERACTIVE PITCH */}
+      {showVideoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="max-w-3xl w-full bg-slate-900/95 border border-purple-500/30 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-100 relative overflow-hidden max-h-[90vh] flex flex-col">
+            {/* Top ambient highlight line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400" />
+
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-all active:scale-95 z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping" />
+                <span className="text-[11px] font-mono text-purple-300 uppercase font-bold tracking-wider">
+                  Somnia × DreamDEX Hackathon • Video Walkthrough
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-100 tracking-tight">
+                {t('video_modal_title')}
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {t('video_modal_sub')}
+              </p>
+            </div>
+
+            {/* Step / Chapter Pills Navigator */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-white/[0.08]">
+              {[
+                { step: 0, label: lang === 'en' ? '🎬 Video Player' : '🎬 Vidéo', icon: Play },
+                { step: 1, label: lang === 'en' ? '1. Problem' : '1. Problème', icon: AlertTriangle },
+                { step: 2, label: lang === 'en' ? '2. Bayesian Swarm' : '2. Essaim Bayésien', icon: Bot },
+                { step: 3, label: lang === 'en' ? '3. Somnia L1 (105k TPS)' : '3. Somnia L1 (105k TPS)', icon: Zap },
+                { step: 4, label: lang === 'en' ? '4. Radar & PvP' : '4. Radar & PvP', icon: Swords },
+                { step: 5, label: lang === 'en' ? '5. On-Chain Proofs' : '5. Preuves On-Chain', icon: Shield },
+              ].map(c => {
+                const Icon = c.icon;
+                const isSelected = videoActiveStep === c.step;
+                return (
+                  <button
+                    key={c.step}
+                    onClick={() => setVideoActiveStep(c.step)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                      isSelected
+                        ? 'bg-purple-500/20 text-purple-200 border border-purple-500/40 font-bold'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <Icon className="w-3 h-3" />
+                    <span>{c.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Body depending on videoActiveStep */}
+            <div className="overflow-y-auto flex-1 space-y-4 pr-1">
+              {videoActiveStep === 0 && (
+                <div className="space-y-4">
+                  {/* Video Container */}
+                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex items-center justify-center group">
+                    {customVideoUrl ? (
+                      <iframe
+                        src={
+                          customVideoUrl.includes('youtube.com/watch?v=')
+                            ? customVideoUrl.replace('watch?v=', 'embed/')
+                            : customVideoUrl.includes('youtu.be/')
+                            ? `https://www.youtube.com/embed/${customVideoUrl.split('youtu.be/')[1]}`
+                            : customVideoUrl.includes('loom.com/share/')
+                            ? customVideoUrl.replace('share', 'embed')
+                            : customVideoUrl
+                        }
+                        title="DreamSentinel Video Walkthrough"
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
+                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-105 transition-transform">
+                          <Play className="w-8 h-8 text-white fill-white translate-x-0.5" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-white mb-1">
+                            DreamSentinel AI Pitch & Live Demo (3 min)
+                          </h4>
+                          <p className="text-xs text-slate-400 max-w-md">
+                            {lang === 'en'
+                              ? 'Autonomous Bayesian AI Swarm trading DreamDEX Event Contracts on Somnia Reactive L1.'
+                              : 'Essaim d\'agents bayésiens autonomes pour les Event Contracts DreamDEX sur Somnia L1.'}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] font-mono text-cyan-300 bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-500/30">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                          <span>Somnia Shannon Testnet (50312) • 105,420 TPS</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Custom Video URL Input */}
+                  <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/[0.08] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-300">
+                        {t('video_enter_url')}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono">
+                        YouTube / Loom / MP4
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        placeholder="https://www.youtube.com/watch?v=... ou https://www.loom.com/share/..."
+                        defaultValue={customVideoUrl}
+                        id="customVideoInput"
+                        className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500"
+                      />
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('customVideoInput') as HTMLInputElement;
+                          if (input) handleSaveVideoUrl(input.value.trim());
+                        }}
+                        className="px-3 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold transition-all shrink-0 active:scale-95"
+                      >
+                        {t('video_save_url')}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Read Script Guide Shortcut */}
+                  <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                    <span className="text-purple-200">
+                      📄 {lang === 'en' ? 'Complete video script & voiceover available in' : 'Script complet et voix-off disponibles dans'} <code className="text-purple-300 bg-purple-950/50 px-1.5 py-0.5 rounded font-mono">VIDEO_SCRIPT.md</code>
+                    </span>
+                    <button
+                      onClick={() => setVideoActiveStep(1)}
+                      className="text-purple-300 hover:text-white font-bold underline flex items-center gap-1 shrink-0"
+                    >
+                      <span>{lang === 'en' ? 'Start Interactive Pitch Tour' : 'Démarrer le Pitch Interactif'}</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {videoActiveStep === 1 && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  <div className="p-4 rounded-2xl bg-slate-950/70 border border-rose-500/30 space-y-2">
+                    <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>{t('video_step_1_title')}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {t('video_step_1_desc')}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                      <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-center">
+                        <div className="text-xs font-bold text-rose-300">Fragmentation</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Split CLOB liquidity' : 'Orderbooks divisés'}</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
+                        <div className="text-xs font-bold text-amber-300">{lang === 'en' ? 'High Latency' : 'Haute Latence'}</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? '12s+ on slow L1s' : '12s+ sur les L1 lentes'}</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-center">
+                        <div className="text-xs font-bold text-orange-300">{lang === 'en' ? 'Emotional Sizing' : 'Biais Émotionnel'}</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Suboptimal allocation' : 'Perte du capital'}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <button onClick={() => setVideoActiveStep(0)} className="text-xs text-slate-400 hover:text-white">← {lang === 'en' ? 'Video Player' : 'Lecteur'}</button>
+                    <button onClick={() => setVideoActiveStep(2)} className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold">
+                      {lang === 'en' ? 'Next: AI Swarm →' : 'Suivant : Essaim d\'IA →'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {videoActiveStep === 2 && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  <div className="p-4 rounded-2xl bg-slate-950/70 border border-cyan-500/30 space-y-2">
+                    <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm">
+                      <Bot className="w-4 h-4" />
+                      <span>{t('video_step_2_title')}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {t('video_step_2_desc')}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                      <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                        <div className="text-xs font-bold text-cyan-300">Alpha Scalper</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Order Book Imbalance (OBI)' : 'Déséquilibre du carnet d\'ordres (OBI)'}</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-teal-500/10 border border-teal-500/20">
+                        <div className="text-xs font-bold text-teal-300">Bayesian Arb</div>
+                        <div className="text-[10px] text-slate-400 font-mono">Kelly f* = (bp - q)/b</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                        <div className="text-xs font-bold text-purple-300">Macro Hedger</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Volatility & shock protection' : 'Protection contre la volatilité'}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <button
+                      onClick={() => {
+                        setShowVideoModal(false);
+                        setActiveTab('swarm');
+                      }}
+                      className="text-xs text-cyan-400 hover:underline font-bold flex items-center gap-1"
+                    >
+                      <span>{t('video_try_feature')}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setVideoActiveStep(3)} className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold">
+                      {lang === 'en' ? 'Next: Somnia L1 →' : 'Suivant : Somnia L1 →'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {videoActiveStep === 3 && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  <div className="p-4 rounded-2xl bg-slate-950/70 border border-emerald-500/30 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                      <Zap className="w-4 h-4" />
+                      <span>{t('video_step_3_title')}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {t('video_step_3_desc')}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 pt-2">
+                      <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+                        <div className="text-lg font-bold text-emerald-300 font-mono">105,420 TPS</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Ultra-high throughput' : 'Débit ultra-rapide Somnia'}</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center">
+                        <div className="text-lg font-bold text-cyan-300 font-mono">&lt; 0.0001 STT</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Sub-cent gas fees' : 'Frais de gaz négligeables'}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <button onClick={() => setVideoActiveStep(2)} className="text-xs text-slate-400 hover:text-white">← {lang === 'en' ? 'Previous' : 'Précédent'}</button>
+                    <button onClick={() => setVideoActiveStep(4)} className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold">
+                      {lang === 'en' ? 'Next: Radar & PvP →' : 'Suivant : Radar & PvP →'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {videoActiveStep === 4 && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  <div className="p-4 rounded-2xl bg-slate-950/70 border border-indigo-500/30 space-y-2">
+                    <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
+                      <Swords className="w-4 h-4" />
+                      <span>{t('video_step_4_title')}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {t('video_step_4_desc')}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 pt-2">
+                      <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                        <div className="text-xs font-bold text-indigo-300">{lang === 'en' ? 'Arbitrage Radar' : 'Radar d\'Arbitrage'}</div>
+                        <div className="text-[10px] text-slate-400">{lang === 'en' ? 'DreamDEX vs Polymarket spreads' : 'Écarts DreamDEX vs Polymarket'}</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                        <div className="text-xs font-bold text-rose-300">{lang === 'en' ? '60s Micro-Duels' : 'Duels PvP 60s'}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">PvPDuelEscrow.sol</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <button
+                      onClick={() => {
+                        setShowVideoModal(false);
+                        setActiveTab('pvp');
+                      }}
+                      className="text-xs text-rose-400 hover:underline font-bold flex items-center gap-1"
+                    >
+                      <span>{lang === 'en' ? 'Launch a 60s PvP Duel' : 'Lancer un Duel PvP'}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setVideoActiveStep(5)} className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold">
+                      {lang === 'en' ? 'Next: On-Chain Proofs →' : 'Suivant : Preuves On-Chain →'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {videoActiveStep === 5 && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  <div className="p-4 rounded-2xl bg-slate-950/70 border border-emerald-500/30 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                      <Shield className="w-4 h-4" />
+                      <span>{t('video_step_5_title')}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {t('video_step_5_desc')}
+                    </p>
+                    <div className="space-y-1.5 font-mono text-[11px] pt-1">
+                      <div className="flex justify-between p-2 rounded-lg bg-slate-900 border border-white/[0.06]">
+                        <span className="text-slate-400">DreamSentinelOracle:</span>
+                        <a href="https://shannon-explorer.somnia.network/address/0xE1B0f9Fdab26E6470520911BA7CCBda48650541D" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">0xE1B0...541D ↗</a>
+                      </div>
+                      <div className="flex justify-between p-2 rounded-lg bg-slate-900 border border-white/[0.06]">
+                        <span className="text-slate-400">DreamSentinelVault:</span>
+                        <a href="https://shannon-explorer.somnia.network/address/0x7F4EA982ef392D1e7F46798fE7618e31F1bE689a" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">0x7F4E...689a ↗</a>
+                      </div>
+                      <div className="flex justify-between p-2 rounded-lg bg-slate-900 border border-white/[0.06]">
+                        <span className="text-slate-400">PvPDuelEscrow:</span>
+                        <a href="https://shannon-explorer.somnia.network/address/0x773D7953a12F070618C8f7061435a9C020dA6F2A" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">0x773D...6F2A ↗</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <button onClick={() => setVideoActiveStep(4)} className="text-xs text-slate-400 hover:text-white">← {lang === 'en' ? 'Previous' : 'Précédent'}</button>
+                    <button
+                      onClick={() => setShowVideoModal(false)}
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-black text-xs font-bold shadow-lg shadow-cyan-500/20 active:scale-95"
+                    >
+                      🚀 {lang === 'en' ? 'Enter Trading Terminal' : 'Accéder au Terminal de Trading'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Somnia Shannon Testnet • Chain ID: 50312</span>
+              <span>DoraHacks Event Contracts Track</span>
+            </div>
           </div>
         </div>
       )}
