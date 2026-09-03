@@ -5,11 +5,12 @@ import {
   TrendingUp, TrendingDown, Cpu, Zap, Shield, Bot, LineChart, 
   Wallet, Award, Activity, ArrowUpRight, Sparkles, MessageSquare, 
   Layers, CheckCircle, AlertTriangle, RefreshCw, Send, Check, ChevronRight, DollarSign, Swords,
-  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft
+  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft, Volume2, VolumeX
 } from 'lucide-react';
 import { Market, AgentProfile, ThoughtLog, SwarmStatus, ActionCard, CopilotMessage } from '../types';
 import { fetchMarkets, fetchAgents, sendCopilotMessage, executeTrade, getFallbackMarkets, getFallbackSwarmStatus } from '../lib/api';
 import { translations, Language } from '../lib/translations';
+import { playWeb3Sound } from '../lib/sounds';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 
@@ -247,13 +248,39 @@ export default function Home() {
     }
   };
 
-  // Check URL query parameters for tab routing (e.g. ?tab=swarm)
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [isJudgeDemoActive, setIsJudgeDemoActive] = useState<boolean>(false);
+
+  // Activate 1-Click Judge Demo Mode (Instant funded VIP Judge access for testing)
+  const handleActivateJudgeDemo = () => {
+    setIsJudgeDemoActive(true);
+    setWalletConnected(true);
+    setWalletAddress('0x773D...6F2A');
+    setWalletAddressFull('0x773D7953a12F070618C8f7061435a9C020dA6F2A');
+    setUsdsoBalance(5420.00);
+    setVaultUserBalance(1250.00);
+    playWeb3Sound('demo', soundEnabled);
+    toast.success(t('judge_demo_toast'));
+  };
+
+  // Check URL query parameters for tab and modal routing (e.g. ?tab=swarm, ?modal=contracts)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
       if (tabParam && ['terminal', 'swarm', 'copilot', 'scanner', 'backtest', 'pvp', 'vaults', 'leaderboard'].includes(tabParam)) {
         setActiveTab(tabParam as any);
+      }
+      if (params.get('modal') === 'contracts') {
+        setShowContractsModal(true);
+      }
+      if (params.get('modal') === 'vault_deposit') {
+        setSelectedVaultDeposit({
+          name: 'Somnia Alpha Vault (ERC-4626)',
+          symbol: 'sdALPHA',
+          address: '0x7F4EA982ef392D1e7F46798fE7618e31F1bE689a',
+          apy: 28.4
+        });
       }
     }
   }, []);
@@ -496,6 +523,7 @@ export default function Home() {
       setIsDepositing(false);
       const vaultName = selectedVaultDeposit?.symbol || 'Vault';
       setSelectedVaultDeposit(null);
+      playWeb3Sound('success', soundEnabled);
       toast.success(`Dépôt réussi dans ${vaultName} !`, {
         description: `Tx: 0x${Math.random().toString(16).slice(2, 10)}... validée sur Somnia Shannon L1`,
       });
@@ -585,6 +613,7 @@ export default function Home() {
     setTimeout(() => {
       setIsTrading(false);
       setUsdsoBalance(prev => Math.max(0, prev - amountVal));
+      playWeb3Sound('trade', soundEnabled);
       setTradeSuccessMsg(`✅ Ordre exécuté sur Somnia L1 : Achat de ${amountVal} USDso de ${outcomeStr} @ $${priceVal.toFixed(2)}.`);
       setTimeout(() => setTradeSuccessMsg(null), 5000);
     }, 400);
@@ -704,10 +733,39 @@ export default function Home() {
             </button>
 
             {/* Somnia Shannon Network Indicator */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono">
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span>Somnia (50312)</span>
             </div>
+
+            {/* Judge 1-Click Demo VIP Access Button */}
+            <button
+              onClick={handleActivateJudgeDemo}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shadow-sm active:scale-95 border ${
+                isJudgeDemoActive
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-emerald-500/20'
+                  : 'bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-300 border-amber-500/40'
+              }`}
+              title={t('judge_demo_btn')}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <span>{isJudgeDemoActive ? t('judge_demo_active') : t('judge_demo_btn')}</span>
+            </button>
+
+            {/* Sound FX Toggle */}
+            <button
+              onClick={() => {
+                const next = !soundEnabled;
+                setSoundEnabled(next);
+                if (next) playWeb3Sound('click', true);
+              }}
+              className={`p-2 rounded-xl border text-xs transition-all active:scale-95 ${
+                soundEnabled ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300' : 'bg-slate-900 border-white/10 text-slate-500'
+              }`}
+              title={t('sound_toggle')}
+            >
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            </button>
 
             {/* WALLET BUTTON OR ACCOUNT PILL + DISCONNECT BUTTON */}
             {walletConnected ? (
@@ -1698,6 +1756,56 @@ export default function Home() {
                   </button>
                 </div>
               ))}
+            </div>
+
+            {/* PROTOCOL ECONOMIC FLYWHEEL & TOKENOMICS */}
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900/90 via-purple-950/30 to-cyan-950/30 border border-purple-500/30 space-y-5 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.08] pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base text-slate-100 flex items-center gap-2">
+                      <span>{t('flywheel_title')}</span>
+                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                        Somnia Tokenomics
+                      </span>
+                    </h4>
+                    <p className="text-xs text-slate-400">{t('flywheel_sub')}</p>
+                  </div>
+                </div>
+                <div className="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-3 py-1.5 rounded-xl border border-emerald-500/30 flex items-center gap-2 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Protocol Revenue: Sustainable & Non-Inflationary</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5">
+                <div className="p-4 rounded-2xl bg-slate-950/70 border border-purple-500/20 hover:border-purple-500/40 transition-all space-y-2">
+                  <div className="text-xs font-mono text-purple-400 font-bold">01 • Performance</div>
+                  <div className="text-sm font-bold text-purple-200">{t('flywheel_pillar_1_title')}</div>
+                  <p className="text-xs text-slate-400 leading-relaxed">{t('flywheel_pillar_1_desc')}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950/70 border border-cyan-500/20 hover:border-cyan-500/40 transition-all space-y-2">
+                  <div className="text-xs font-mono text-cyan-400 font-bold">02 • PvP Escrow</div>
+                  <div className="text-sm font-bold text-cyan-200">{t('flywheel_pillar_2_title')}</div>
+                  <p className="text-xs text-slate-400 leading-relaxed">{t('flywheel_pillar_2_desc')}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950/70 border border-emerald-500/20 hover:border-emerald-500/40 transition-all space-y-2">
+                  <div className="text-xs font-mono text-emerald-400 font-bold">03 • Market Making</div>
+                  <div className="text-sm font-bold text-emerald-200">{t('flywheel_pillar_3_title')}</div>
+                  <p className="text-xs text-slate-400 leading-relaxed">{t('flywheel_pillar_3_desc')}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950/70 border border-amber-500/20 hover:border-amber-500/40 transition-all space-y-2">
+                  <div className="text-xs font-mono text-amber-400 font-bold">04 • Value Accrual</div>
+                  <div className="text-sm font-bold text-amber-200">{t('flywheel_pillar_4_title')}</div>
+                  <p className="text-xs text-slate-400 leading-relaxed">{t('flywheel_pillar_4_desc')}</p>
+                </div>
+              </div>
             </div>
 
           </div>
