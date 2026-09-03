@@ -91,6 +91,7 @@ export default function Home() {
   // Navigation
   const [activeTab, setActiveTab] = useState<'terminal' | 'swarm' | 'copilot' | 'scanner' | 'backtest' | 'pvp' | 'vaults' | 'leaderboard'>('terminal');
   const [terminalSubTab, setTerminalSubTab] = useState<'orderbook' | 'ai_alpha' | 'trades' | 'positions'>('orderbook');
+  const [showHowItWorks, setShowHowItWorks] = useState<boolean>(true);
   
   // Data states
   const [markets, setMarkets] = useState<Market[]>(getFallbackMarkets());
@@ -742,6 +743,66 @@ export default function Home() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
 
+        {/* 💡 BEGINNER-FRIENDLY GUIDE BANNER: Event Contracts in 3 Simple Steps */}
+        {showHowItWorks ? (
+          <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-cyan-950/40 via-slate-900/60 to-purple-950/40 border border-cyan-500/30 relative overflow-hidden shadow-lg animate-in fade-in duration-300">
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">💡</span>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-cyan-200">
+                    {t('how_it_works_title')}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {t('how_it_works_sub')}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowHowItWorks(false)}
+                className="text-xs text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 transition-colors shrink-0"
+              >
+                ✕ {t('hide_guide')}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/[0.06] flex items-start gap-3">
+                <div className="w-7 h-7 rounded-xl bg-cyan-500/20 text-cyan-300 font-bold text-xs flex items-center justify-center shrink-0">1</div>
+                <div>
+                  <div className="text-xs font-bold text-slate-200 mb-0.5">{t('step_1_title')}</div>
+                  <div className="text-[11px] text-slate-400 leading-snug">{t('step_1_desc')}</div>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/[0.06] flex items-start gap-3">
+                <div className="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-300 font-bold text-xs flex items-center justify-center shrink-0">2</div>
+                <div>
+                  <div className="text-xs font-bold text-slate-200 mb-0.5">{t('step_2_title')}</div>
+                  <div className="text-[11px] text-slate-400 leading-snug">{t('step_2_desc')}</div>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/[0.06] flex items-start gap-3">
+                <div className="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0">3</div>
+                <div>
+                  <div className="text-xs font-bold text-slate-200 mb-0.5">{t('step_3_title')}</div>
+                  <div className="text-[11px] text-slate-400 leading-snug">{t('step_3_desc')}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => setShowHowItWorks(true)}
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 transition-all hover:bg-cyan-900/40"
+            >
+              <span>{t('how_it_works_title')}</span>
+            </button>
+          </div>
+        )}
+
         {/* TAB 1: TRADING TERMINAL */}
         {activeTab === 'terminal' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -813,6 +874,7 @@ export default function Home() {
                 <MarketChartsPanel
                   market={currentMarket}
                   aiProbability={0.682}
+                  lang={lang}
                 />
               </div>
 
@@ -822,10 +884,10 @@ export default function Home() {
                 <div className="flex items-center justify-between px-4 pt-3 border-b border-white/[0.06] bg-slate-950/40">
                   <div className="flex items-center gap-1">
                     {[
-                      { id: 'orderbook', label: lang === 'en' ? 'CLOB Orderbook' : 'Carnet CLOB', icon: LineChart },
-                      { id: 'ai_alpha', label: lang === 'en' ? 'Bayesian AI Alpha' : 'Alpha Bayésien IA', icon: Cpu },
-                      { id: 'trades', label: lang === 'en' ? 'Live Trades' : 'Transactions Récentes', icon: Activity },
-                      { id: 'positions', label: lang === 'en' ? 'My Positions (2)' : 'Mes Positions (2)', icon: Layers },
+                      { id: 'orderbook', label: t('subtab_orderbook'), icon: LineChart },
+                      { id: 'ai_alpha', label: t('subtab_ai_alpha'), icon: Cpu },
+                      { id: 'trades', label: t('subtab_trades'), icon: Activity },
+                      { id: 'positions', label: `${t('subtab_positions')} (2)`, icon: Layers },
                     ].map(st => {
                       const Icon = st.icon;
                       const isSubActive = terminalSubTab === st.id;
@@ -964,7 +1026,7 @@ export default function Home() {
                       </div>
 
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Model: Bayesian Sequential Quant Engine • Verified on Somnia Oracle</span>
+                        <span className="text-slate-400">{t('model_oracle_footer')}</span>
                         <button
                           onClick={() => {
                             setTradeOutcome('YES');
@@ -973,7 +1035,7 @@ export default function Home() {
                           }}
                           className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-bold transition-all shadow-sm"
                         >
-                          {lang === 'en' ? '⚡ Copy Signal to Ticket' : '⚡ Copier le Signal dans l\'Ordre'}
+                          {t('copy_signal_btn')}
                         </button>
                       </div>
                     </div>
@@ -1025,7 +1087,7 @@ export default function Home() {
                         <div key={idx} className="flex justify-between items-center py-2 border-b border-white/[0.04] px-1 rounded bg-slate-900/40">
                           <span className="font-bold text-slate-200">{pos.market}</span>
                           <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">{pos.outcome}</span>
-                          <span className="text-slate-300">{pos.shares} parts</span>
+                          <span className="text-slate-300">{pos.shares} {lang === 'en' ? 'shares' : 'parts'}</span>
                           <span className="text-slate-400">{pos.entry}</span>
                           <span className="text-slate-200 font-bold">{pos.mark}</span>
                           <span className={`font-bold ${pos.pnlColor}`}>{pos.pnl}</span>
@@ -1162,17 +1224,24 @@ export default function Home() {
                   <div className="bg-surface/90 rounded-xl p-3.5 border border-surfaceBorder space-y-2 text-xs">
                     <div className="flex justify-between text-slate-400">
                       <span>{t('shares_acquired')} :</span>
-                      <span className="text-slate-200 font-mono font-bold">{Math.round(tradeAmount / tradePrice)} parts</span>
+                      <span className="text-slate-200 font-mono font-bold">
+                        {Math.round(tradeAmount / tradePrice)} {lang === 'en' ? 'shares' : 'parts'}
+                      </span>
                     </div>
                     <div className="flex justify-between text-slate-400">
                       <span>{t('payout_at_settlement')} :</span>
-                      <span className="text-emerald-400 font-mono font-bold">${Math.round((tradeAmount / tradePrice))} USDso</span>
+                      <span className="text-emerald-400 font-mono font-bold">
+                        ${Math.round((tradeAmount / tradePrice))} USDso
+                      </span>
                     </div>
                     <div className="flex justify-between text-slate-400 pt-1.5 border-t border-surfaceBorder">
                       <span>{t('net_profit')} :</span>
                       <span className="text-emerald-400 font-bold font-mono">
                         +{Math.round(((1 / tradePrice) - 1) * 100)}%
                       </span>
+                    </div>
+                    <div className="pt-1 text-[10px] text-cyan-400/80 text-center font-mono">
+                      ℹ️ {t('order_payout_hint')}
                     </div>
                   </div>
                 </div>
@@ -1186,7 +1255,7 @@ export default function Home() {
                   {isTrading ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>{lang === 'en' ? 'Routing on Somnia L1...' : 'Routage sur Somnia L1...'}</span>
+                      <span>{t('routing_somnia')}</span>
                     </>
                   ) : (
                     <>
@@ -1259,9 +1328,9 @@ export default function Home() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Cpu className="w-5 h-5 text-cyan-400" />
-                  <h3 className="font-bold text-base text-slate-100">Flux de Pensée IA en Direct (Chain-of-Thought Stream)</h3>
+                  <h3 className="font-bold text-base text-slate-100">{t('swarm_cot_title')}</h3>
                 </div>
-                <span className="text-xs text-slate-400 font-mono">Actualisation temps réel Somnia Reactive L1</span>
+                <span className="text-xs text-slate-400 font-mono">{t('swarm_cot_sub')}</span>
               </div>
 
               <div className="space-y-3 font-mono text-xs max-h-[500px] overflow-y-auto pr-2">
@@ -1287,7 +1356,7 @@ export default function Home() {
                       </div>
                       <p className="text-slate-300 leading-relaxed font-sans text-xs">{log.content}</p>
                       <div className="flex justify-between items-center text-[10px] text-slate-400 pt-1 border-t border-surfaceBorder/40">
-                        <span>Confiance : <strong className="text-cyan-300">{Math.round(log.confidence * 100)}%</strong></span>
+                        <span>{t('confidence_label')} <strong className="text-cyan-300">{Math.round(log.confidence * 100)}%</strong></span>
                         <span className="text-emerald-400 font-semibold">{log.action_taken}</span>
                       </div>
                     </div>
@@ -1312,12 +1381,12 @@ export default function Home() {
                     <Bot className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-slate-100">Copilote de Prédiction Intelligent</h3>
-                    <p className="text-xs text-slate-400">Analyste quantitatif et exécuteur d\'ordres 1-Click sur Somnia</p>
+                    <h3 className="font-bold text-base text-slate-100">{t('copilot_title')}</h3>
+                    <p className="text-xs text-slate-400">{t('copilot_sub')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400">Marché analysé :</span>
+                  <span className="text-xs text-slate-400">{t('copilot_analyzing_market')}</span>
                   <span className="text-xs font-bold text-cyan-400">{currentMarket.symbol}</span>
                 </div>
               </div>
@@ -1342,19 +1411,21 @@ export default function Home() {
                       {msg.action_card && (
                         <div className="mt-3 bg-slate-900/90 rounded-2xl p-4 border border-cyan-500/40 space-y-3">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-cyan-400 text-xs uppercase">Opportunité Détectée</span>
+                            <span className="font-bold text-cyan-400 text-xs uppercase">{t('opportunity_detected')}</span>
                             <span className="text-xs text-emerald-400 font-bold font-mono">EV +{msg.action_card.expected_ev_pct}%</span>
                           </div>
                           <div className="text-xs text-slate-300 font-semibold">{msg.action_card.market_title}</div>
                           <div className="flex justify-between items-center text-xs">
-                            <span className="text-slate-400">Position recommandée :</span>
-                            <span className="font-bold text-emerald-400 font-mono">ACHETER {msg.action_card.recommended_outcome} @ ${msg.action_card.suggested_price}</span>
+                            <span className="text-slate-400">{t('recommended_position')}</span>
+                            <span className="font-bold text-emerald-400 font-mono">
+                              {lang === 'en' ? 'BUY' : 'ACHETER'} {msg.action_card.recommended_outcome} @ ${msg.action_card.suggested_price}
+                            </span>
                           </div>
                           <button
                             onClick={() => handlePlaceOrder(msg.action_card?.recommended_outcome, msg.action_card?.suggested_price, msg.action_card?.suggested_amount)}
                             className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-black font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2"
                           >
-                            <span>Exécuter en 1 Clic sur Somnia</span>
+                            <span>{t('execute_1click_somnia')}</span>
                             <ArrowUpRight className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -1365,7 +1436,7 @@ export default function Home() {
                 {isCopilotLoading && (
                   <div className="flex items-center gap-2 text-xs text-cyan-400 bg-surface/50 p-3 rounded-2xl w-fit border border-surfaceBorder">
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Le Copilote calcule les probabilités bayésiennes...</span>
+                    <span>{t('copilot_calculating')}</span>
                   </div>
                 )}
                 <div ref={chatBottomRef} />
@@ -1374,10 +1445,10 @@ export default function Home() {
               {/* Quick Prompts */}
               <div className="pt-3 flex items-center gap-2 overflow-x-auto text-[11px] pb-1">
                 {[
-                  "Quel est l'edge actuel sur le BTC ?",
-                  "Faut-il acheter OUI sur le testnet Somnia ?",
-                  "Explique la stratégie de Sentinel-Alpha",
-                  "Calcule le dimensionnement de Kelly pour 500$"
+                  lang === 'en' ? 'What is the current BTC 5M edge?' : "Quel est l'edge actuel sur le BTC ?",
+                  lang === 'en' ? 'Should I buy YES on Somnia testnet?' : "Faut-il acheter OUI sur le testnet Somnia ?",
+                  lang === 'en' ? 'Explain Sentinel-Alpha scalping strategy' : "Explique la stratégie de Sentinel-Alpha",
+                  lang === 'en' ? 'Calculate Kelly position sizing for $500' : "Calcule le dimensionnement de Kelly pour 500$"
                 ].map((prompt, idx) => (
                   <button
                     key={idx}
@@ -1396,7 +1467,7 @@ export default function Home() {
                   value={copilotInput}
                   onChange={(e) => setCopilotInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendCopilot()}
-                  placeholder="Posez une question sur un marché ou demandez une analyse..."
+                  placeholder={t('copilot_placeholder')}
                   className="flex-1 bg-slate-900/90 border border-surfaceBorder rounded-2xl px-4 py-3 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                 />
                 <button
@@ -1419,14 +1490,14 @@ export default function Home() {
             <div className="glass-panel rounded-3xl p-6 border border-cyan-500/30">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-100">Coffres de Copy-Trading Décentralisés (Vaults)</h3>
-                  <p className="text-xs text-slate-400">
-                    Déposez vos USDso dans des smart contracts non-custodiaux sur Somnia L1. Les agents IA exécutent les trades automatiquement selon des règles mathématiques strictes.
+                  <h3 className="text-lg font-bold text-slate-100">{t('vaults_title')}</h3>
+                  <p className="text-xs text-slate-400 max-w-2xl mt-1">
+                    {t('vaults_sub')}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-xs text-slate-400">Votre Solde Vault</div>
+                    <div className="text-xs text-slate-400">{t('vault_your_balance')}</div>
                     <div className="text-lg font-mono font-bold text-cyan-400">${vaultUserBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDso</div>
                   </div>
                 </div>
@@ -1443,8 +1514,8 @@ export default function Home() {
                   maxDd: '15%',
                   pnl: '+$4,820.50',
                   tvl: '$124,500 USDso',
-                  desc: 'Scalping ultra-rapide sur les micro-événements BTC/ETH à échéance 5 minutes.',
-                  risk: 'Élevé'
+                  desc: lang === 'en' ? 'Ultra-fast scalping on 5-minute BTC/ETH micro-events with sub-second execution.' : 'Scalping ultra-rapide sur les micro-événements BTC/ETH à échéance 5 minutes.',
+                  risk: lang === 'en' ? 'High' : 'Élevé'
                 },
                 {
                   id: 'v_arb',
@@ -1454,8 +1525,8 @@ export default function Home() {
                   maxDd: '10%',
                   pnl: '+$8,940.20',
                   tvl: '$280,000 USDso',
-                  desc: 'Exploitation des anomalies de cotes entre DreamDEX CLOB et les flux spot/oracles.',
-                  risk: 'Modéré'
+                  desc: lang === 'en' ? 'Captures odds discrepancies between DreamDEX CLOB and spot oracle feeds.' : 'Exploitation des anomalies de cotes entre DreamDEX CLOB et les flux spot/oracles.',
+                  risk: lang === 'en' ? 'Moderate' : 'Modéré'
                 },
                 {
                   id: 'v_macro',
@@ -1465,8 +1536,8 @@ export default function Home() {
                   maxDd: '5%',
                   pnl: '+$3,410.80',
                   tvl: '$195,000 USDso',
-                  desc: 'Prise de position sur les jalons de l\'écosystème Somnia avec couverture systématique.',
-                  risk: 'Conservateur'
+                  desc: lang === 'en' ? 'Systematic event contract positioning on Somnia ecosystem milestones.' : 'Prise de position sur les jalons de l\'écosystème Somnia avec couverture systématique.',
+                  risk: lang === 'en' ? 'Conservative' : 'Conservateur'
                 }
               ].map(vault => (
                 <div key={vault.id} className="glass-panel rounded-3xl p-6 flex flex-col justify-between space-y-5">
@@ -1481,15 +1552,15 @@ export default function Home() {
 
                     <div className="space-y-2.5 text-xs bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800 font-mono">
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Rendement Historique :</span>
+                        <span className="text-slate-400">{t('vault_hist_return')}</span>
                         <span className="text-emerald-400 font-bold">{vault.apy}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Drawdown Max Garanti :</span>
+                        <span className="text-slate-400">{t('vault_max_dd')}</span>
                         <span className="text-slate-200">{vault.maxDd}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">TVL Gérée :</span>
+                        <span className="text-slate-400">{t('vault_tvl_managed')}</span>
                         <span className="text-cyan-300">{vault.tvl}</span>
                       </div>
                     </div>
@@ -1502,7 +1573,7 @@ export default function Home() {
                     }}
                     className="w-full py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition-all shadow-md"
                   >
-                    Déposer dans le Vault ({vault.symbol})
+                    {t('vault_deposit_action')} ({vault.symbol})
                   </button>
                 </div>
               ))}
@@ -1516,10 +1587,10 @@ export default function Home() {
           <div className="glass-panel rounded-3xl p-6 space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-slate-100">Classement des Traders & Agents DreamDEX</h3>
-                <p className="text-xs text-slate-400">Performances vérifiées sur la blockchain Somnia Shannon</p>
+                <h3 className="text-lg font-bold text-slate-100">{t('leaderboard_title')}</h3>
+                <p className="text-xs text-slate-400">{t('leaderboard_sub')}</p>
               </div>
-              <span className="text-xs text-cyan-400 font-bold">Top 5 Hebdomadaire</span>
+              <span className="text-xs text-cyan-400 font-bold">{t('leaderboard_weekly')}</span>
             </div>
 
             <div className="space-y-3 font-mono text-xs">
@@ -1536,7 +1607,7 @@ export default function Home() {
                     <span className="font-semibold text-slate-200">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-6">
-                    <span className="text-slate-400">{item.trades} trades</span>
+                    <span className="text-slate-400">{item.trades} {t('trades_label')}</span>
                     <span className="text-cyan-400 font-bold">{item.winRate}</span>
                     <span className="text-emerald-400 font-bold">{item.pnl}</span>
                   </div>
@@ -1549,21 +1620,21 @@ export default function Home() {
         {/* TAB 6: BACKTEST SIMULATOR */}
         {activeTab === 'backtest' && (
           <div className="space-y-6">
-            <BacktestSimulator />
+            <BacktestSimulator lang={lang} />
           </div>
         )}
 
         {/* TAB 7: ARBITRAGE SCANNER */}
         {activeTab === 'scanner' && (
           <div className="space-y-6">
-            <ArbitrageScanner />
+            <ArbitrageScanner lang={lang} />
           </div>
         )}
 
         {/* TAB 8: PVP DUELS */}
         {activeTab === 'pvp' && (
           <div className="space-y-6">
-            <PvPDuels />
+            <PvPDuels lang={lang} />
           </div>
         )}
 

@@ -12,15 +12,31 @@ type ChartView = 'candle' | 'probability' | 'depth';
 interface MarketChartsPanelProps {
   market: Market;
   aiProbability?: number;
+  lang?: 'en' | 'fr';
 }
 
-export function MarketChartsPanel({ market, aiProbability = 0.682 }: MarketChartsPanelProps) {
+export function MarketChartsPanel({ market, aiProbability = 0.682, lang = 'en' }: MarketChartsPanelProps) {
   const [activeView, setActiveView] = useState<ChartView>('candle');
 
   const tabs: { id: ChartView; label: string; icon: React.ElementType; description: string }[] = [
-    { id: 'candle', label: 'Prix Spot', icon: TrendingUp, description: 'Chandeliers + Volume 30s' },
-    { id: 'probability', label: 'Probabilités IA', icon: BarChart2, description: 'Bayésien vs CLOB' },
-    { id: 'depth', label: 'Profondeur CLOB', icon: Layers, description: 'Carnet d\'ordres DreamDEX' },
+    { 
+      id: 'candle', 
+      label: lang === 'en' ? 'Spot Price' : 'Prix Spot', 
+      icon: TrendingUp, 
+      description: lang === 'en' ? 'Candles + 30s Volume' : 'Chandeliers + Volume 30s' 
+    },
+    { 
+      id: 'probability', 
+      label: lang === 'en' ? 'AI Probabilities' : 'Probabilités IA', 
+      icon: BarChart2, 
+      description: lang === 'en' ? 'Bayesian vs CLOB' : 'Bayésien vs CLOB' 
+    },
+    { 
+      id: 'depth', 
+      label: lang === 'en' ? 'CLOB Depth' : 'Profondeur CLOB', 
+      icon: Layers, 
+      description: lang === 'en' ? 'DreamDEX Orderbook' : 'Carnet d\'ordres DreamDEX' 
+    },
   ];
 
   return (

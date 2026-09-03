@@ -17,7 +17,11 @@ interface ArbitrageOpp {
   timestamp: number;
 }
 
-export function ArbitrageScanner() {
+interface ArbitrageScannerProps {
+  lang?: 'en' | 'fr';
+}
+
+export function ArbitrageScanner({ lang = 'en' }: ArbitrageScannerProps) {
   const [opportunities, setOpportunities] = useState<ArbitrageOpp[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastScan, setLastScan] = useState<Date | null>(null);
@@ -28,7 +32,7 @@ export function ArbitrageScanner() {
     setError(null);
     try {
       const res = await fetch('http://localhost:8000/api/arbitrage/scan');
-      if (!res.ok) throw new Error('Erreur réseau lors du scan');
+      if (!res.ok) throw new Error(lang === 'en' ? 'Network error during scan' : 'Erreur réseau lors du scan');
       const data = await res.json();
       if (data.success) {
         setOpportunities(data.opportunities);
@@ -53,18 +57,23 @@ export function ArbitrageScanner() {
       <div className="glass-panel rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <Crosshair className="text-cyan-400 w-6 h-6" /> Scanner d'Arbitrage Cross-Market
+            <Crosshair className="text-cyan-400 w-6 h-6" />
+            {lang === 'en' ? 'Cross-Market Arbitrage Scanner' : 'Scanner d\'Arbitrage Cross-Market'}
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Recherche continue des inefficacités de prix et déséquilibres de probabilités sur DreamDEX.
+            {lang === 'en'
+              ? 'Continuous algorithmic detection of price mispricings and probability imbalances on DreamDEX.'
+              : 'Recherche continue des inefficacités de prix et déséquilibres de probabilités sur DreamDEX.'}
           </p>
         </div>
         
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="text-xs text-slate-500 mb-1">Dernier scan</div>
+            <div className="text-xs text-slate-500 mb-1">{lang === 'en' ? 'Last Scan' : 'Dernier scan'}</div>
             <div className="text-sm font-mono text-cyan-400">
-              {loading ? 'Analyse en cours...' : lastScan ? lastScan.toLocaleTimeString() : 'En attente'}
+              {loading 
+                ? (lang === 'en' ? 'Scanning...' : 'Analyse en cours...') 
+                : lastScan ? lastScan.toLocaleTimeString() : (lang === 'en' ? 'Pending' : 'En attente')}
             </div>
           </div>
           
@@ -72,6 +81,7 @@ export function ArbitrageScanner() {
             onClick={scanMarkets}
             disabled={loading}
             className="w-12 h-12 rounded-2xl bg-surface/50 border border-surfaceBorder hover:border-cyan-500/50 hover:bg-cyan-500/10 flex items-center justify-center transition-all disabled:opacity-50"
+            title={lang === 'en' ? 'Refresh scan' : 'Actualiser le scan'}
           >
             <RefreshCw className={`w-5 h-5 text-cyan-400 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -115,13 +125,17 @@ export function ArbitrageScanner() {
 
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="p-3 rounded-2xl bg-surface/40 border border-surfaceBorder/50">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Edge (Avantage)</div>
+                  <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
+                    {lang === 'en' ? 'Alpha Edge' : 'Edge (Avantage)'}
+                  </div>
                   <div className="text-lg font-mono font-black text-emerald-400">
                     +{(opp.edge * 100).toFixed(2)}%
                   </div>
                 </div>
                 <div className="p-3 rounded-2xl bg-surface/40 border border-surfaceBorder/50">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Confiance IA</div>
+                  <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
+                    {lang === 'en' ? 'AI Confidence' : 'Confiance IA'}
+                  </div>
                   <div className="text-lg font-mono font-black text-cyan-400">
                     {(opp.confidence * 100).toFixed(0)}%
                   </div>
@@ -129,14 +143,15 @@ export function ArbitrageScanner() {
               </div>
 
               <div className="flex items-center justify-between text-xs text-slate-400 mb-5 px-1">
-                <div>Prob Marché: <span className="font-mono text-slate-300">{(opp.market_prob * 100).toFixed(1)}%</span></div>
+                <div>{lang === 'en' ? 'Market Odds:' : 'Prob Marché:'} <span className="font-mono text-slate-300">{(opp.market_prob * 100).toFixed(1)}%</span></div>
                 <TrendingUp className="w-4 h-4 text-slate-600 mx-2" />
-                <div>Prob Modèle: <span className="font-mono text-cyan-400">{(opp.model_prob * 100).toFixed(1)}%</span></div>
+                <div>{lang === 'en' ? 'Model Odds:' : 'Prob Modèle:'} <span className="font-mono text-cyan-400">{(opp.model_prob * 100).toFixed(1)}%</span></div>
               </div>
 
               <button className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all
                 bg-surfaceBorder/30 hover:bg-cyan-500/20 text-cyan-400 hover:text-cyan-300 border border-transparent hover:border-cyan-500/50">
-                <Zap className="w-4 h-4" /> Exploiter l'Arbitrage
+                <Zap className="w-4 h-4" />
+                {lang === 'en' ? 'Capture Arbitrage' : 'Exploiter l\'Arbitrage'}
               </button>
             </div>
           </div>
@@ -145,8 +160,8 @@ export function ArbitrageScanner() {
         {opportunities.length === 0 && !loading && (
           <div className="col-span-full py-12 flex flex-col items-center justify-center text-slate-500 glass-panel rounded-3xl">
             <Crosshair className="w-12 h-12 mb-3 opacity-20" />
-            <p>Aucune opportunité d'arbitrage détectée pour le moment.</p>
-            <p className="text-xs mt-1 opacity-60">Le scanner tourne en tâche de fond...</p>
+            <p>{lang === 'en' ? 'No arbitrage opportunities detected at this time.' : 'Aucune opportunité d\'arbitrage détectée pour le moment.'}</p>
+            <p className="text-xs mt-1 opacity-60">{lang === 'en' ? 'The scanner is continuously monitoring in the background...' : 'Le scanner tourne en tâche de fond...'}</p>
           </div>
         )}
       </div>

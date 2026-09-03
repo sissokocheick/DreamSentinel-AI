@@ -11,6 +11,9 @@ export const translations = {
     connect_wallet: 'Connect Wallet',
     disconnect_wallet: 'Disconnect',
     demo_mode: 'Demo Mode',
+    active_wallet: 'Active Wallet',
+    wallet_not_connected: 'No wallet connected',
+    connect_wallet_btn: 'Connect',
     
     // Ticker Stats
     ticker_tps: 'Somnia TPS',
@@ -21,43 +24,66 @@ export const translations = {
     ticker_tvl: 'Vault TVL',
     ticker_oracle: 'Oracle',
 
+    // Beginner-Friendly Guide
+    how_it_works_title: '💡 How It Works (Event Contracts in 3 Simple Steps)',
+    how_it_works_sub: 'Predict real-world crypto events on Somnia L1 with high-frequency institutional execution',
+    step_1_title: '1. Pick a Market',
+    step_1_desc: 'Select a 5-minute or 1-hour price target (e.g., Will BTC exceed $98,500 in 5 min?).',
+    step_2_title: '2. Buy YES or NO',
+    step_2_desc: 'Shares trade between $0.05 and $0.95 reflecting real-time market probability.',
+    step_3_title: '3. Win $1.00 USDso',
+    step_3_desc: 'If your prediction is right at expiry, each share settles at $1.00 USDso directly into your wallet.',
+    hide_guide: 'Hide Guide',
+    show_guide: 'How it works?',
+
     // Navigation Tabs
-    tab_terminal: 'CLOB Terminal',
+    tab_terminal: 'Trading Terminal',
     tab_swarm: 'AI Swarm Live',
     tab_copilot: 'AI Copilot',
-    tab_scanner: 'Arbitrage Scanner',
-    tab_backtest: 'Quant Backtest',
-    tab_pvp: 'PvP 60s Duels',
-    tab_vaults: 'Copy-Trading Vaults',
+    tab_scanner: 'Arbitrage Radar',
+    tab_backtest: 'Strategy Backtest',
+    tab_pvp: '60s PvP Duels',
+    tab_vaults: 'AI Copy-Vaults',
     tab_leaderboard: 'Leaderboard',
+
+    // Sub-Tabs in Terminal
+    subtab_orderbook: 'CLOB Orderbook',
+    subtab_ai_alpha: 'Bayesian AI Alpha',
+    subtab_trades: 'Live Trades',
+    subtab_positions: 'My Positions',
 
     // Terminal & Market Selector
     market_select_title: 'Select Prediction Market',
     strike_label: 'Target Strike',
     expiry_label: 'Time to Expiry',
-    spot_price_label: 'Spot Price',
+    spot_price_label: 'Live Spot Price',
     volume_label: '24h Volume',
     open_interest_label: 'Open Interest',
     best_bid: 'Best Bid',
     best_ask: 'Best Ask',
 
     // Order Placement
-    order_panel_title: 'Place Event Contract Order',
+    order_panel_title: 'Place Prediction Order',
     buy_yes: 'BUY YES',
     buy_no: 'BUY NO',
-    yes_sub: 'Predict event happens',
-    no_sub: 'Predict event fails',
+    yes_sub: 'Event occurs',
+    no_sub: 'Event fails',
     order_amount_label: 'Investment Amount (USDso)',
     quick_presets: 'Quick Amounts',
     shares_acquired: 'Shares Acquired',
-    payout_at_settlement: 'Potential Payout at Expiry',
-    net_profit: 'Potential Net Return',
+    payout_at_settlement: 'Potential Return at Expiry',
+    net_profit: 'Estimated Net Gain',
     place_order_btn: 'Execute Order on Somnia L1',
     order_success: 'Order Executed on Somnia L1',
+    routing_somnia: 'Routing on Somnia L1...',
+    order_payout_hint: 'Each winning share settles at $1.00 USDso',
+    copy_signal_btn: '⚡ Copy Signal to Order Ticket',
+    edge_badge: 'Edge +22.4% (STRONG BUY YES)',
+    model_oracle_footer: 'Model: Bayesian Sequential Quant Engine • Verified on Somnia Oracle',
 
     // Bayesian AI Alpha & Edge
     ai_alpha_title: 'Bayesian Swarm Signal & Alpha Edge',
-    market_prob: 'Market Implied Prob',
+    market_prob: 'Market Implied Odds',
     ai_bayesian_prob: 'AI Bayesian Forecast',
     arbitrage_edge: 'Alpha Edge',
     kelly_allocation: 'Kelly Sizing',
@@ -65,11 +91,12 @@ export const translations = {
     signal_strong_sell: 'STRONG BUY NO',
     signal_neutral: 'NEUTRAL HOLD',
     brier_score_label: 'On-Chain Brier Score',
+    confidence_label: 'Confidence:',
 
     // Orderbook CLOB
     orderbook_title: 'DreamDEX CLOB Orderbook',
     price_col: 'Price (USDso)',
-    size_col: 'Size',
+    size_col: 'Shares',
     total_col: 'Total (USDso)',
     spread: 'Spread',
 
@@ -80,29 +107,46 @@ export const translations = {
     tx_hash_col: 'Tx Hash',
 
     // Swarm Tab
-    swarm_title: 'Autonomous Swarm Intelligence (DeepMind Inspired)',
+    swarm_title: 'Autonomous Swarm Intelligence (DeepMind Architecture)',
     swarm_sub: 'Four specialized AI agents continuously analyzing orderbook microstructure, macro signals, and on-chain settlements.',
     agent_status_active: 'Active • Analyzing',
     agent_status_idle: 'Monitoring Stream',
     recent_thoughts_title: 'Swarm Neural Stream & Decision Log',
+    swarm_cot_title: 'Live AI Chain-of-Thought Stream',
+    swarm_cot_sub: 'Real-time updates via Somnia Reactive L1',
 
     // Copilot Tab
-    copilot_title: 'DreamSentinel AI Copilot',
-    copilot_sub: 'Ask any question regarding prediction markets, Kelly betting sizing, DreamDEX liquidity, or request instant trade execution.',
+    copilot_title: 'Intelligent Prediction Copilot',
+    copilot_sub: 'Quantitative analyst & 1-click execution engine on Somnia L1',
     copilot_placeholder: 'Ask the Swarm (e.g. "Scan for arbitrage opportunities on BTC 5M market")...',
     copilot_send: 'Send',
+    copilot_analyzing_market: 'Analyzed Market:',
+    opportunity_detected: 'Opportunity Detected',
+    recommended_position: 'Recommended Position:',
+    execute_1click_somnia: 'Execute 1-Click on Somnia',
+    copilot_calculating: 'Copilot is computing Bayesian probabilities...',
     copilot_quick_1: 'What is the current BTC 5M edge?',
     copilot_quick_2: 'Explain Kelly sizing for YES contracts',
     copilot_quick_3: 'Show DreamSentinel on-chain vault APY',
 
     // Vaults Tab
-    vaults_title: 'ERC-4626 Copy-Trading Vaults',
-    vaults_sub: 'Deposit $USDso into audited algorithmic vaults managed autonomously by DreamSentinel Swarm on Somnia L1.',
+    vaults_title: 'Decentralized Copy-Trading Vaults (ERC-4626)',
+    vaults_sub: 'Deposit $USDso into non-custodial smart contracts on Somnia L1. AI agents execute trades autonomously with strict mathematical risk boundaries.',
     vault_deposit_btn: 'Deposit USDso',
+    vault_deposit_action: 'Deposit into Vault',
     vault_apy: 'Historical APY',
     vault_tvl: 'Total Value Locked',
-    vault_your_balance: 'Your Deposited Balance',
+    vault_your_balance: 'Your Deposited Vault Balance',
     vault_strategy: 'Strategy',
+    vault_hist_return: 'Historical Yield:',
+    vault_max_dd: 'Max Guaranteed Drawdown:',
+    vault_tvl_managed: 'Managed TVL:',
+
+    // Leaderboard Tab
+    leaderboard_title: 'DreamDEX Traders & AI Agents Leaderboard',
+    leaderboard_sub: 'Verified on-chain performance on Somnia Shannon Testnet',
+    leaderboard_weekly: 'Weekly Top 5',
+    trades_label: 'trades',
 
     // Duels Tab
     pvp_title: '60-Second PvP Micro-Prediction Duels',
@@ -115,7 +159,7 @@ export const translations = {
 
     // Modals
     wallet_modal_title: 'Connect a Web3 Wallet',
-    wallet_modal_sub: 'Choose your wallet to trade on Somnia Shannon Testnet.',
+    wallet_modal_sub: 'Select your Web3 wallet or use the Somnia 1-Click Demo.',
     wallet_metamask: 'MetaMask',
     wallet_metamask_sub: 'Rabby, Brave Wallet or any EVM extension',
     wallet_phantom: 'Phantom Wallet',
@@ -123,7 +167,7 @@ export const translations = {
     wallet_demo: 'Somnia Demo Mode (1-Click)',
     wallet_demo_sub: 'Instant access with $5,420.00 USDso pre-loaded',
     recommended_badge: 'Recommended',
-    evm_badge: 'EVM Natif',
+    evm_badge: 'EVM Native',
     instant_badge: 'Instant 1-Click',
     contracts_modal_title: 'Deployed & Verified On-Chain Contracts',
     contracts_modal_sub: 'Somnia Shannon Testnet • Chain ID: 50312 • RPC: https://dream-rpc.somnia.network',
@@ -146,6 +190,9 @@ export const translations = {
     connect_wallet: 'Connecter Portefeuille',
     disconnect_wallet: 'Déconnecter',
     demo_mode: 'Mode Démo',
+    active_wallet: 'Portefeuille Connecté',
+    wallet_not_connected: 'Aucun portefeuille connecté',
+    connect_wallet_btn: 'Connecter',
 
     // Ticker Stats
     ticker_tps: 'Somnia TPS',
@@ -156,15 +203,33 @@ export const translations = {
     ticker_tvl: 'TVL Vaults',
     ticker_oracle: 'Oracle',
 
+    // Beginner-Friendly Guide
+    how_it_works_title: '💡 Comment ça marche (Les Event Contracts en 3 étapes simples)',
+    how_it_works_sub: 'Prédisez des événements crypto sur Somnia L1 avec exécution institutionnelle à haute fréquence',
+    step_1_title: '1. Choisissez un Marché',
+    step_1_desc: 'Sélectionnez un objectif de prix à 5 min ou 1h (ex: Le Bitcoin dépassera-t-il 98 500 $ en 5 min ?).',
+    step_2_title: '2. Achetez OUI ou NON',
+    step_2_desc: 'Les parts s\'échangent entre 0.05$ et 0.95$ selon la probabilité en direct calculée par le marché.',
+    step_3_title: '3. Gagnez 1.00$ USDso',
+    step_3_desc: 'Si votre prédiction se réalise à l\'échéance, chaque part rapporte 1.00$ USDso payé directement sur votre portefeuille.',
+    hide_guide: 'Masquer le guide',
+    show_guide: 'Comment ça marche ?',
+
     // Navigation Tabs
-    tab_terminal: 'Terminal CLOB',
+    tab_terminal: 'Terminal de Trading',
     tab_swarm: 'Essaim IA Live',
     tab_copilot: 'Copilote IA',
-    tab_scanner: 'Scanner d\'Arbitrage',
-    tab_backtest: 'Backtest Quant',
+    tab_scanner: 'Radar d\'Arbitrage',
+    tab_backtest: 'Backtest Stratégie',
     tab_pvp: 'Duels PvP 60s',
-    tab_vaults: 'Vaults Copy-Trading',
+    tab_vaults: 'Coffres Copy-Vaults',
     tab_leaderboard: 'Classement',
+
+    // Sub-Tabs in Terminal
+    subtab_orderbook: 'Carnet CLOB',
+    subtab_ai_alpha: 'Alpha Bayésien IA',
+    subtab_trades: 'Transactions Récentes',
+    subtab_positions: 'Mes Positions',
 
     // Terminal & Market Selector
     market_select_title: 'Sélectionner le Marché de Prédiction',
@@ -177,7 +242,7 @@ export const translations = {
     best_ask: 'Meilleure Demande (Ask)',
 
     // Order Placement
-    order_panel_title: 'Passer un Ordre Event Contract',
+    order_panel_title: 'Passer un Ordre de Prédiction',
     buy_yes: 'ACHETER OUI',
     buy_no: 'ACHETER NON',
     yes_sub: 'L\'événement se réalise',
@@ -185,14 +250,19 @@ export const translations = {
     order_amount_label: 'Montant à Investir (USDso)',
     quick_presets: 'Montants Rapides',
     shares_acquired: 'Parts Obtenues',
-    payout_at_settlement: 'Paiement Potentiel à Résolution',
+    payout_at_settlement: 'Rendement Potentiel à Échéance',
     net_profit: 'Gain Net Estimé',
     place_order_btn: 'Exécuter l\'Ordre sur Somnia L1',
     order_success: 'Ordre Exécuté sur Somnia L1',
+    routing_somnia: 'Routage sur Somnia L1...',
+    order_payout_hint: 'Chaque part gagnante rapporte 1.00$ USDso',
+    copy_signal_btn: '⚡ Copier le Signal dans l\'Ordre',
+    edge_badge: 'Edge +22.4% (ACHAT FORT OUI)',
+    model_oracle_footer: 'Modèle : Moteur Quantitatif Séquentiel Bayésien • Vérifié sur Somnia Oracle',
 
     // Bayesian AI Alpha & Edge
     ai_alpha_title: 'Signal Bayésien de l\'Essaim & Alpha Edge',
-    market_prob: 'Probabilité Implicite du Marché',
+    market_prob: 'Cote Implicite du Marché',
     ai_bayesian_prob: 'Prédiction Bayésienne IA',
     arbitrage_edge: 'Alpha Edge',
     kelly_allocation: 'Allocation de Kelly',
@@ -200,11 +270,12 @@ export const translations = {
     signal_strong_sell: 'ACHAT FORT NON',
     signal_neutral: 'ATTENTE NEUTRE',
     brier_score_label: 'Score de Brier On-Chain',
+    confidence_label: 'Confiance :',
 
     // Orderbook CLOB
     orderbook_title: 'Carnet d\'Ordres CLOB DreamDEX',
     price_col: 'Prix (USDso)',
-    size_col: 'Taille',
+    size_col: 'Parts',
     total_col: 'Total (USDso)',
     spread: 'Écart (Spread)',
 
@@ -215,29 +286,46 @@ export const translations = {
     tx_hash_col: 'Hash Tx',
 
     // Swarm Tab
-    swarm_title: 'Intelligence d\'Essaim Autonome (Style DeepMind)',
+    swarm_title: 'Intelligence d\'Essaim Autonome (Architecture DeepMind)',
     swarm_sub: 'Quatre agents IA spécialisés analysant en continu la microstructure du carnet d\'ordres, les flux macro et les règlements on-chain.',
     agent_status_active: 'Actif • En Analyse',
     agent_status_idle: 'Surveillance du Flux',
     recent_thoughts_title: 'Flux Neuronal & Journal de Décisions',
+    swarm_cot_title: 'Flux de Pensée IA en Direct (Chain-of-Thought Stream)',
+    swarm_cot_sub: 'Actualisation temps réel Somnia Reactive L1',
 
     // Copilot Tab
-    copilot_title: 'Copilote IA DreamSentinel',
-    copilot_sub: 'Posez vos questions sur les marchés de prédiction, la formule de Kelly, la liquidité DreamDEX ou demandez une exécution immédiate.',
+    copilot_title: 'Copilote de Prédiction Intelligent',
+    copilot_sub: 'Analyste quantitatif et exécuteur d\'ordres 1-Click sur Somnia L1',
     copilot_placeholder: 'Posez une question à l\'Essaim (ex: "Scanne les opportunités d\'arbitrage sur BTC 5M")...',
     copilot_send: 'Envoyer',
+    copilot_analyzing_market: 'Marché analysé :',
+    opportunity_detected: 'Opportunité Détectée',
+    recommended_position: 'Position recommandée :',
+    execute_1click_somnia: 'Exécuter en 1 Clic sur Somnia',
+    copilot_calculating: 'Le Copilote calcule les probabilités bayésiennes...',
     copilot_quick_1: 'Quel est l\'edge actuel sur BTC 5M ?',
     copilot_quick_2: 'Explique la formule de Kelly sur les parts OUI',
     copilot_quick_3: 'Affiche l\'APY du vault on-chain DreamSentinel',
 
     // Vaults Tab
-    vaults_title: 'Vaults de Copy-Trading ERC-4626',
-    vaults_sub: 'Déposez vos $USDso dans des coffres algorithmiques gérés de manière autonome par l\'Essaim DreamSentinel sur Somnia L1.',
+    vaults_title: 'Coffres de Copy-Trading Décentralisés (ERC-4626)',
+    vaults_sub: 'Déposez vos $USDso dans des smart contracts non-custodiaux sur Somnia L1. Les agents IA exécutent les trades automatiquement selon des règles mathématiques strictes.',
     vault_deposit_btn: 'Déposer USDso',
+    vault_deposit_action: 'Déposer dans le Vault',
     vault_apy: 'APY Historique',
     vault_tvl: 'Valeur Totale Verrouillée',
-    vault_your_balance: 'Votre Solde Déposé',
+    vault_your_balance: 'Votre Solde Déposé en Coffre',
     vault_strategy: 'Stratégie',
+    vault_hist_return: 'Rendement Historique :',
+    vault_max_dd: 'Drawdown Max Garanti :',
+    vault_tvl_managed: 'TVL Gérée :',
+
+    // Leaderboard Tab
+    leaderboard_title: 'Classement des Traders & Agents DreamDEX',
+    leaderboard_sub: 'Performances vérifiées sur la blockchain Somnia Shannon Testnet',
+    leaderboard_weekly: 'Top 5 Hebdomadaire',
+    trades_label: 'trades',
 
     // Duels Tab
     pvp_title: 'Duels de Micro-Prédiction PvP 60s',
@@ -250,7 +338,7 @@ export const translations = {
 
     // Modals
     wallet_modal_title: 'Connecter un Portefeuille Web3',
-    wallet_modal_sub: 'Choisissez votre portefeuille pour trader sur Somnia Shannon Testnet.',
+    wallet_modal_sub: 'Sélectionnez votre portefeuille Web3 ou utilisez la démo 1-clic Somnia.',
     wallet_metamask: 'MetaMask',
     wallet_metamask_sub: 'Rabby, Brave Wallet ou extension EVM',
     wallet_phantom: 'Phantom Wallet',

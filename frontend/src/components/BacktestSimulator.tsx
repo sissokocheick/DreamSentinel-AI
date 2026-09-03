@@ -170,7 +170,11 @@ const STRATEGIES = [
   { id: 'sentinel_macro', label: 'Sentinel-Macro', sub: 'Delta-Hedged Events', icon: '🌐' },
 ];
 
-export function BacktestSimulator() {
+interface BacktestSimulatorProps {
+  lang?: 'en' | 'fr';
+}
+
+export function BacktestSimulator({ lang = 'en' }: BacktestSimulatorProps) {
   // ── Params
   const [strategyId, setStrategyId] = useState('sentinel_bayes');
   const [capital, setCapital] = useState(10000);
@@ -220,12 +224,12 @@ export function BacktestSimulator() {
       setResult(data.result);
       setProgress(100);
     } catch (err: any) {
-      setError(`Erreur: ${err.message}. Démarrez le backend avec: uvicorn server:app`);
+      setError(lang === 'en' ? `Error: ${err.message}. Ensure backend is running with: uvicorn server:app` : `Erreur: ${err.message}. Démarrez le backend avec: uvicorn server:app`);
     } finally {
       clearInterval(timer);
       setLoading(false);
     }
-  }, [strategyId, capital, kellyScale, minEdge, confidenceThreshold, days, tradesPerDay]);
+  }, [strategyId, capital, kellyScale, minEdge, confidenceThreshold, days, tradesPerDay, lang]);
 
   const isProfit = result ? result.total_pnl >= 0 : true;
 
@@ -238,7 +242,7 @@ export function BacktestSimulator() {
         {/* Strategy selector */}
         <div className="glass-panel rounded-3xl p-5 space-y-3">
           <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-            <span className="text-cyan-400">🤖</span> Stratégie IA
+            <span className="text-cyan-400">🤖</span> {lang === 'en' ? 'AI Strategy' : 'Stratégie IA'}
           </h3>
           <div className="space-y-2">
             {STRATEGIES.map(s => (
@@ -265,44 +269,44 @@ export function BacktestSimulator() {
         {/* Parameters */}
         <div className="glass-panel rounded-3xl p-5 space-y-5">
           <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-            <span className="text-violet-400">⚙️</span> Paramètres de Simulation
+            <span className="text-violet-400">⚙️</span> {lang === 'en' ? 'Simulation Parameters' : 'Paramètres de Simulation'}
           </h3>
 
           <SliderControl
-            label="Capital Initial" value={capital} min={1000} max={100000} step={1000}
+            label={lang === 'en' ? 'Initial Capital' : 'Capital Initial'} value={capital} min={1000} max={100000} step={1000}
             format={v => `$${v.toLocaleString()}`}
             onChange={setCapital}
-            description="Capital de départ en USDso"
+            description={lang === 'en' ? 'Starting capital in USDso' : 'Capital de départ en USDso'}
           />
           <SliderControl
             label="Kelly Scale" value={kellyScale} min={0.1} max={1.0} step={0.05}
             format={v => `${(v * 100).toFixed(0)}%`}
             onChange={setKellyScale}
-            description="Fraction du critère Kelly appliquée (conservateur → agressif)"
+            description={lang === 'en' ? 'Fraction of Kelly criterion applied (conservative → aggressive)' : 'Fraction du critère Kelly appliquée (conservateur → agressif)'}
           />
           <SliderControl
-            label="Edge Minimum" value={minEdge} min={0.01} max={0.10} step={0.005}
+            label={lang === 'en' ? 'Minimum Edge' : 'Edge Minimum'} value={minEdge} min={0.01} max={0.10} step={0.005}
             format={v => `${(v * 100).toFixed(1)}%`}
             onChange={setMinEdge}
-            description="Edge bayésien minimum requis pour trader"
+            description={lang === 'en' ? 'Minimum Bayesian edge required to enter a trade' : 'Edge bayésien minimum requis pour trader'}
           />
           <SliderControl
-            label="Confiance IA" value={confidenceThreshold} min={0.5} max={0.95} step={0.05}
+            label={lang === 'en' ? 'AI Confidence' : 'Confiance IA'} value={confidenceThreshold} min={0.5} max={0.95} step={0.05}
             format={v => `${(v * 100).toFixed(0)}%`}
             onChange={setConfidenceThreshold}
-            description="Seuil de confiance du modèle de sentiment"
+            description={lang === 'en' ? 'Sentiment & microstructure model confidence threshold' : 'Seuil de confiance du modèle de sentiment'}
           />
           <SliderControl
-            label="Durée" value={days} min={7} max={90} step={7}
-            format={v => `${v}j`}
+            label={lang === 'en' ? 'Duration' : 'Durée'} value={days} min={7} max={90} step={7}
+            format={v => `${v}${lang === 'en' ? 'd' : 'j'}`}
             onChange={setDays}
-            description="Nombre de jours simulés"
+            description={lang === 'en' ? 'Number of simulated days' : 'Nombre de jours simulés'}
           />
           <SliderControl
-            label="Trades / Jour" value={tradesPerDay} min={2} max={20} step={1}
+            label={lang === 'en' ? 'Trades / Day' : 'Trades / Jour'} value={tradesPerDay} min={2} max={20} step={1}
             format={v => `${v}`}
             onChange={setTradesPerDay}
-            description="Nombre d'opportunités ciblées par jour"
+            description={lang === 'en' ? 'Number of target opportunities per day' : 'Nombre d\'opportunités ciblées par jour'}
           />
         </div>
 
@@ -317,12 +321,12 @@ export function BacktestSimulator() {
           {loading ? (
             <>
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Simulation en cours… {progress.toFixed(0)}%
+              {lang === 'en' ? `Simulation in progress… ${progress.toFixed(0)}%` : `Simulation en cours… ${progress.toFixed(0)}%`}
             </>
           ) : (
             <>
               <Play className="w-4 h-4" />
-              Lancer le Backtest
+              {lang === 'en' ? 'Run Quant Backtest' : 'Lancer le Backtest'}
             </>
           )}
         </button>
@@ -351,16 +355,20 @@ export function BacktestSimulator() {
           <div className="glass-panel rounded-3xl p-12 flex flex-col items-center justify-center text-center gap-5 min-h-[400px]">
             <div className="text-6xl">📊</div>
             <div>
-              <h3 className="text-xl font-bold text-slate-200 mb-2">Simulateur de Backtesting Interactif</h3>
+              <h3 className="text-xl font-bold text-slate-200 mb-2">
+                {lang === 'en' ? 'Interactive Quant Backtest Simulator' : 'Simulateur de Backtesting Interactif'}
+              </h3>
               <p className="text-slate-400 text-sm max-w-md">
-                Configurez vos paramètres et lancez une simulation pour voir comment DreamSentinel AI aurait performé sur des marchés DreamDEX historiques.
+                {lang === 'en'
+                  ? 'Configure parameters and execute simulations to evaluate DreamSentinel AI performance against historical DreamDEX CLOB orderbooks.'
+                  : 'Configurez vos paramètres et lancez une simulation pour voir comment DreamSentinel AI aurait performé sur des marchés DreamDEX historiques.'}
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-500">
-              <span className="px-3 py-1 rounded-full bg-slate-800">🧠 Moteur Bayésien</span>
-              <span className="px-3 py-1 rounded-full bg-slate-800">📐 Kelly Criterion</span>
-              <span className="px-3 py-1 rounded-full bg-slate-800">📈 Courbe d'Équité</span>
-              <span className="px-3 py-1 rounded-full bg-slate-800">🔍 Journal de Trades</span>
+              <span className="px-3 py-1 rounded-full bg-slate-800">{lang === 'en' ? '🧠 Bayesian Engine' : '🧠 Moteur Bayésien'}</span>
+              <span className="px-3 py-1 rounded-full bg-slate-800">{lang === 'en' ? '📐 Kelly Criterion' : '📐 Kelly Criterion'}</span>
+              <span className="px-3 py-1 rounded-full bg-slate-800">{lang === 'en' ? '📈 Equity Curve' : '📈 Courbe d\'Équité'}</span>
+              <span className="px-3 py-1 rounded-full bg-slate-800">{lang === 'en' ? '🔍 Trade Execution Log' : '🔍 Journal de Trades'}</span>
             </div>
           </div>
         )}
@@ -372,8 +380,12 @@ export function BacktestSimulator() {
               <div className="absolute inset-0 rounded-full border-4 border-t-cyan-400 animate-spin" />
             </div>
             <div className="text-center">
-              <p className="text-slate-200 font-bold">Simulation en cours…</p>
-              <p className="text-slate-500 text-xs mt-1">Analyse bayésienne sur {days} jours × {tradesPerDay} trades/jour</p>
+              <p className="text-slate-200 font-bold">{lang === 'en' ? 'Simulation in progress…' : 'Simulation en cours…'}</p>
+              <p className="text-slate-500 text-xs mt-1">
+                {lang === 'en'
+                  ? `Bayesian analysis across ${days} days × ${tradesPerDay} trades/day`
+                  : `Analyse bayésienne sur ${days} jours × ${tradesPerDay} trades/jour`}
+              </p>
             </div>
           </div>
         )}
@@ -384,9 +396,11 @@ export function BacktestSimulator() {
             <div className="glass-panel rounded-3xl p-5">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
-                  <div className="text-xs text-slate-400 mb-0.5">Stratégie simulée</div>
+                  <div className="text-xs text-slate-400 mb-0.5">{lang === 'en' ? 'Simulated Strategy' : 'Stratégie simulée'}</div>
                   <div className="text-lg font-black text-slate-100">{result.strategy_name}</div>
-                  <div className="text-xs text-slate-500 mt-1">{days} jours • {result.total_trades} trades exécutés</div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    {days} {lang === 'en' ? 'days' : 'jours'} • {result.total_trades} {lang === 'en' ? 'trades executed' : 'trades exécutés'}
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className={`text-3xl font-black font-mono ${isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
@@ -402,9 +416,9 @@ export function BacktestSimulator() {
             {/* Stats grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <StatCard
-                label="P&L Total" color={isProfit ? 'emerald' : 'rose'}
+                label={lang === 'en' ? 'Total P&L' : 'P&L Total'} color={isProfit ? 'emerald' : 'rose'}
                 value={`${isProfit ? '+' : ''}$${result.total_pnl.toFixed(0)}`}
-                sub={`${isProfit ? '+' : ''}${result.total_pnl_pct}% de rendement`}
+                sub={`${isProfit ? '+' : ''}${result.total_pnl_pct}% ${lang === 'en' ? 'return' : 'de rendement'}`}
               />
               <StatCard
                 label="Win Rate" color={result.win_rate_pct >= 55 ? 'emerald' : 'amber'}
@@ -414,22 +428,22 @@ export function BacktestSimulator() {
               <StatCard
                 label="Sharpe Ratio" color={result.sharpe_ratio >= 1.5 ? 'violet' : 'amber'}
                 value={result.sharpe_ratio.toFixed(2)}
-                sub={result.sharpe_ratio >= 2 ? '🏆 Excellent' : result.sharpe_ratio >= 1 ? '✅ Bon' : '⚠️ Faible'}
+                sub={result.sharpe_ratio >= 2 ? (lang === 'en' ? '🏆 Outstanding' : '🏆 Excellent') : result.sharpe_ratio >= 1 ? (lang === 'en' ? '✅ Good' : '✅ Bon') : (lang === 'en' ? '⚠️ Moderate' : '⚠️ Faible')}
               />
               <StatCard
                 label="Max Drawdown" color={result.max_drawdown_pct < 10 ? 'emerald' : result.max_drawdown_pct < 20 ? 'amber' : 'rose'}
                 value={`-${result.max_drawdown_pct}%`}
-                sub="Perte maximale sur pic"
+                sub={lang === 'en' ? 'Peak-to-trough drop' : 'Perte maximale sur pic'}
               />
               <StatCard
-                label="Trades Totaux" color="cyan"
+                label={lang === 'en' ? 'Total Trades' : 'Trades Totaux'} color="cyan"
                 value={`${result.total_trades}`}
-                sub={`Filtrés sur ${days * tradesPerDay} opportunités`}
+                sub={lang === 'en' ? `Filtered from ${days * tradesPerDay} opportunities` : `Filtrés sur ${days * tradesPerDay} opportunités`}
               />
               <StatCard
-                label="Capital Final" color="cyan"
+                label={lang === 'en' ? 'Final Capital' : 'Capital Final'} color="cyan"
                 value={`$${result.final_capital.toLocaleString()}`}
-                sub={`Initial: $${result.initial_capital.toLocaleString()}`}
+                sub={`${lang === 'en' ? 'Initial' : 'Initial'}: $${result.initial_capital.toLocaleString()}`}
               />
             </div>
 
@@ -440,13 +454,15 @@ export function BacktestSimulator() {
                   onClick={() => setActiveView('chart')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeView === 'chart' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200'}`}
                 >
-                  <TrendingUp className="w-3.5 h-3.5" />Courbe d'Équité
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  {lang === 'en' ? 'Equity Curve' : 'Courbe d\'Équité'}
                 </button>
                 <button
                   onClick={() => setActiveView('trades')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeView === 'trades' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200'}`}
                 >
-                  <List className="w-3.5 h-3.5" />Journal de Trades
+                  <List className="w-3.5 h-3.5" />
+                  {lang === 'en' ? 'Trade Execution Log' : 'Journal de Trades'}
                 </button>
               </div>
 
