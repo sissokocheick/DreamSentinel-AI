@@ -56,6 +56,16 @@ const PvPDuels = dynamic(
   )}
 );
 
+const InteractiveVideoPlayer = dynamic(
+  () => import('../components/InteractiveVideoPlayer').then(m => m.InteractiveVideoPlayer),
+  { ssr: false, loading: () => (
+    <div className="flex items-center justify-center h-64 text-slate-400 text-xs gap-2">
+      <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+      Chargement du lecteur vidéo…
+    </div>
+  )}
+);
+
 
 // Official & Pro Web3 Wallet SVG Icons
 const MetaMaskIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
@@ -2526,77 +2536,16 @@ export default function Home() {
             {/* Body depending on videoActiveStep */}
             <div className="overflow-y-auto flex-1 space-y-4 pr-1">
               {videoActiveStep === 0 && (
-                <div className="space-y-4">
-                  {/* Video Container */}
-                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex items-center justify-center group">
-                    {customVideoUrl ? (
-                      <iframe
-                        src={
-                          customVideoUrl.includes('youtube.com/watch?v=')
-                            ? customVideoUrl.replace('watch?v=', 'embed/')
-                            : customVideoUrl.includes('youtu.be/')
-                            ? `https://www.youtube.com/embed/${customVideoUrl.split('youtu.be/')[1]}`
-                            : customVideoUrl.includes('loom.com/share/')
-                            ? customVideoUrl.replace('share', 'embed')
-                            : customVideoUrl
-                        }
-                        title="DreamSentinel Video Walkthrough"
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
-                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-105 transition-transform">
-                          <Play className="w-8 h-8 text-white fill-white translate-x-0.5" />
-                        </div>
-                        <div>
-                          <h4 className="text-base font-bold text-white mb-1">
-                            DreamSentinel AI Pitch & Live Demo (3 min)
-                          </h4>
-                          <p className="text-xs text-slate-400 max-w-md">
-                            {lang === 'en'
-                              ? 'Autonomous Bayesian AI Swarm trading DreamDEX Event Contracts on Somnia Reactive L1.'
-                              : 'Essaim d\'agents bayésiens autonomes pour les Event Contracts DreamDEX sur Somnia L1.'}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] font-mono text-cyan-300 bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-500/30">
-                          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                          <span>Somnia Shannon Testnet (50312) • 105,420 TPS</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Custom Video URL Input */}
-                  <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/[0.08] space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-300">
-                        {t('video_enter_url')}
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        YouTube / Loom / MP4
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="url"
-                        placeholder="https://www.youtube.com/watch?v=... ou https://www.loom.com/share/..."
-                        defaultValue={customVideoUrl}
-                        id="customVideoInput"
-                        className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500"
-                      />
-                      <button
-                        onClick={() => {
-                          const input = document.getElementById('customVideoInput') as HTMLInputElement;
-                          if (input) handleSaveVideoUrl(input.value.trim());
-                        }}
-                        className="px-3 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold transition-all shrink-0 active:scale-95"
-                      >
-                        {t('video_save_url')}
-                      </button>
-                    </div>
-                  </div>
+                <div className="space-y-3">
+                  <InteractiveVideoPlayer
+                    lang={lang}
+                    onNavigateTab={(tab) => {
+                      setShowVideoModal(false);
+                      setActiveTab(tab as any);
+                    }}
+                    customVideoUrl={customVideoUrl}
+                    onSaveVideoUrl={handleSaveVideoUrl}
+                  />
 
                   {/* Read Script Guide Shortcut */}
                   <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
@@ -2607,7 +2556,7 @@ export default function Home() {
                       onClick={() => setVideoActiveStep(1)}
                       className="text-purple-300 hover:text-white font-bold underline flex items-center gap-1 shrink-0"
                     >
-                      <span>{lang === 'en' ? 'Start Interactive Pitch Tour' : 'Démarrer le Pitch Interactif'}</span>
+                      <span>{lang === 'en' ? 'Explore Chapters In Detail' : 'Explorer les Chapitres en Détail'}</span>
                       <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
