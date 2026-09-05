@@ -861,14 +861,17 @@ export default function Home() {
               </button>
 
               {showToolsDropdown && (
-                <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-slate-950/98 border border-cyan-500/40 rounded-2xl shadow-2xl p-2.5 z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 space-y-1">
-                  <div className="px-2.5 py-1.5 border-b border-white/[0.08] mb-1 flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                <div 
+                  style={{ backgroundColor: '#0a0e1a' }}
+                  className="absolute right-0 mt-2 w-84 sm:w-96 max-w-[calc(100vw-2rem)] border border-cyan-500/50 rounded-2xl shadow-2xl shadow-black/90 p-3 z-[100] animate-in fade-in zoom-in-95 space-y-1.5"
+                >
+                  <div className="px-2.5 py-1.5 border-b border-white/10 mb-1 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 font-mono">
                       {t('ecosystem_tools')}
                     </span>
-                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      Somnia 50312
+                      Somnia Shannon 50312
                     </span>
                   </div>
 
@@ -879,17 +882,17 @@ export default function Home() {
                       setShowToolsDropdown(false);
                       playWeb3Sound('click', soundEnabled);
                     }}
-                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-800/90 text-left transition-all group border border-transparent hover:border-purple-500/30 active:scale-[0.99]"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 group-hover:bg-purple-500/20">
-                      <Calculator className="w-4 h-4 text-purple-400" />
+                    <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center shrink-0 group-hover:bg-purple-500/30">
+                      <Calculator className="w-4 h-4 text-purple-300" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-slate-200 group-hover:text-purple-300 flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-100 group-hover:text-purple-300 flex items-center justify-between">
                         <span>{t('kelly_btn')}</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">Quant</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono border border-purple-500/30">Quant</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
                         {lang === 'en' ? 'Optimal capital sizing & mathematical EV' : 'Optimisation du capital & calcul de l\'EV'}
                       </p>
                     </div>
@@ -902,17 +905,17 @@ export default function Home() {
                       setShowToolsDropdown(false);
                       playWeb3Sound('click', soundEnabled);
                     }}
-                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-800/90 text-left transition-all group border border-transparent hover:border-cyan-500/30 active:scale-[0.99]"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/20">
-                      <Smartphone className="w-4 h-4 text-cyan-400" />
+                    <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/30">
+                      <Smartphone className="w-4 h-4 text-cyan-300" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-slate-200 group-hover:text-cyan-300 flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-100 group-hover:text-cyan-300 flex items-center justify-between">
                         <span>{t('telegram_btn')}</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">Mobile</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono border border-cyan-500/30">Mobile</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
                         {lang === 'en' ? 'Fast mobile trading & instant arbitrage bot' : 'Trading mobile & alertes push d\'arbitrage'}
                       </p>
                     </div>
@@ -925,17 +928,17 @@ export default function Home() {
                       setShowToolsDropdown(false);
                       playWeb3Sound('click', soundEnabled);
                     }}
-                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-800/90 text-left transition-all group border border-transparent hover:border-amber-500/30 active:scale-[0.99]"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:bg-amber-500/20">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 group-hover:bg-amber-500/30">
+                      <Sparkles className="w-4 h-4 text-amber-300" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-slate-200 group-hover:text-amber-300 flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-100 group-hover:text-amber-300 flex items-center justify-between">
                         <span>{t('faucet_btn')}</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">Gas STT</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono border border-amber-500/30">Gas STT</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
                         {lang === 'en' ? 'Claim testnet tokens on Google Cloud & Thirdweb' : 'Réclamez des STT sur Google Cloud & Thirdweb'}
                       </p>
                     </div>
@@ -948,17 +951,17 @@ export default function Home() {
                       setShowToolsDropdown(false);
                       playWeb3Sound('click', soundEnabled);
                     }}
-                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-800/90 text-left transition-all group border border-transparent hover:border-teal-500/30 active:scale-[0.99]"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center shrink-0 group-hover:bg-teal-500/20">
-                      <LinkIcon className="w-4 h-4 text-teal-400" />
+                    <div className="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center shrink-0 group-hover:bg-teal-500/30">
+                      <LinkIcon className="w-4 h-4 text-teal-300" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-slate-200 group-hover:text-teal-300 flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-100 group-hover:text-teal-300 flex items-center justify-between">
                         <span>{t('onchain_contracts_btn')}</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 font-mono">4 Verified</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 font-mono border border-teal-500/30">4 Verified</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
                         {lang === 'en' ? 'View 4 deployed contracts on Somnia Shannon' : '4 contrats intelligents vérifiés sur Somnia'}
                       </p>
                     </div>
@@ -971,24 +974,24 @@ export default function Home() {
                       setShowToolsDropdown(false);
                       playWeb3Sound('click', soundEnabled);
                     }}
-                    className="w-full flex sm:hidden items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                    className="w-full flex sm:hidden items-center gap-3 p-2.5 rounded-xl hover:bg-slate-800/90 text-left transition-all group border border-transparent hover:border-purple-500/30 active:scale-[0.99]"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 group-hover:bg-purple-500/20">
-                      <Film className="w-4 h-4 text-purple-400" />
+                    <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center shrink-0 group-hover:bg-purple-500/30">
+                      <Film className="w-4 h-4 text-purple-300" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-slate-200 group-hover:text-purple-300 flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-100 group-hover:text-purple-300 flex items-center justify-between">
                         <span>{t('video_btn')}</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">Demo</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono border border-purple-500/30">Demo</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
                         {lang === 'en' ? 'Watch video walkthrough & pitch' : 'Voir la vidéo et le pitch'}
                       </p>
                     </div>
                   </button>
 
                   {/* Network Info Footer */}
-                  <div className="pt-2 px-2 border-t border-white/[0.08] flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                  <div className="pt-2 px-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 font-mono">
                     <span>Somnia Shannon (50312)</span>
                     <span className="text-cyan-400 font-bold">#{somniaBlock.toLocaleString()}</span>
                   </div>
