@@ -1084,17 +1084,17 @@ export default function Home() {
         </div>
 
         {/* ROW 2: Dedicated Full Navigation Bar with all 8 tabs for all screens */}
-        <div className="border-t border-surfaceBorder/50 bg-slate-950/50 px-4 py-2">
+        <div className="border-t border-surfaceBorder/50 bg-slate-950/70 px-4 py-2">
           <div className="max-w-7xl mx-auto overflow-x-auto flex items-center gap-1.5 scrollbar-none">
             {[
-              { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart },
-              { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot },
-              { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare },
-              { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap },
-              { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp },
-              { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords },
-              { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers },
-              { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award },
+              { id: 'terminal', labelKey: 'tab_terminal' as const, icon: LineChart, badge: null, badgeColor: '' },
+              { id: 'swarm', labelKey: 'tab_swarm' as const, icon: Bot, badge: 'LIVE', badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 animate-pulse' },
+              { id: 'copilot', labelKey: 'tab_copilot' as const, icon: MessageSquare, badge: 'AI', badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' },
+              { id: 'scanner', labelKey: 'tab_scanner' as const, icon: Zap, badge: 'HOT', badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+              { id: 'backtest', labelKey: 'tab_backtest' as const, icon: TrendingUp, badge: 'Quant', badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30' },
+              { id: 'pvp', labelKey: 'tab_pvp' as const, icon: Swords, badge: '60s', badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30' },
+              { id: 'vaults', labelKey: 'tab_vaults' as const, icon: Layers, badge: 'ERC-4626', badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' },
+              { id: 'leaderboard', labelKey: 'tab_leaderboard' as const, icon: Award, badge: null, badgeColor: '' },
             ].map(tab => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -1104,12 +1104,17 @@ export default function Home() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                     isActive 
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm font-bold' 
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-surfaceBorder/50'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm font-bold ring-1 ring-cyan-500/20' 
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
-                  {t(tab.labelKey)}
+                  <span>{t(tab.labelKey)}</span>
+                  {tab.badge && (
+                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${tab.badgeColor}`}>
+                      {tab.badge}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -1292,7 +1297,7 @@ export default function Home() {
                         {currentMarket.category}
                       </span>
                       <span className="text-xs text-slate-400 font-mono">
-                        ⏱️ Expiry in 5m • Somnia Fast CLOB
+                        {lang === 'en' ? '⏱️ Expiry in 5m • Somnia Fast CLOB' : '⏱️ Échéance dans 5 min • Carnet Somnia CLOB'}
                       </span>
                     </div>
                     <h2 className="text-lg sm:text-xl font-bold text-slate-100">{currentMarket.title}</h2>
@@ -1457,7 +1462,7 @@ export default function Home() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 font-mono text-xs text-center">
                           <div className="p-2.5 rounded-xl bg-slate-950/60 border border-white/[0.06]">
-                            <div className="text-[10px] text-slate-500">Kelly Sizing</div>
+                            <div className="text-[10px] text-slate-500">{lang === 'en' ? 'Kelly Sizing' : 'Allocation Kelly'}</div>
                             <div className="font-bold text-cyan-400">$270 USDso (5.0%)</div>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/60 border border-white/[0.06]">
@@ -1465,7 +1470,7 @@ export default function Home() {
                             <div className="font-bold text-purple-300">0.082 (Top 1%)</div>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/60 border border-white/[0.06]">
-                            <div className="text-[10px] text-slate-500">Expected Value (EV)</div>
+                            <div className="text-[10px] text-slate-500">{lang === 'en' ? 'Expected Value (EV)' : 'Espérance de Gain (EV)'}</div>
                             <div className="font-bold text-emerald-400">+43.9%</div>
                           </div>
                         </div>
@@ -1491,11 +1496,11 @@ export default function Home() {
                   {terminalSubTab === 'trades' && (
                     <div className="space-y-2 font-mono text-xs">
                       <div className="flex justify-between text-slate-500 pb-1 border-b border-white/[0.06] text-[11px]">
-                        <span>Time</span>
-                        <span>Side</span>
-                        <span>Price</span>
-                        <span>Amount</span>
-                        <span>Tx Hash</span>
+                        <span>{lang === 'en' ? 'Time' : 'Heure'}</span>
+                        <span>{lang === 'en' ? 'Side' : 'Sens'}</span>
+                        <span>{lang === 'en' ? 'Price' : 'Prix'}</span>
+                        <span>{lang === 'en' ? 'Amount' : 'Montant'}</span>
+                        <span>{lang === 'en' ? 'Tx Hash' : 'Hash Tx'}</span>
                       </div>
                       {[
                         { time: '23:10:45', side: 'BUY YES', price: '$0.51', amount: '$450 USDso', hash: '0x3a8...c912', sideColor: 'text-emerald-400' },
@@ -1525,12 +1530,12 @@ export default function Home() {
                       ) : (
                         <>
                           <div className="hidden sm:grid grid-cols-7 text-slate-500 pb-1 border-b border-white/[0.06] text-[11px]">
-                            <span className="col-span-2">Market</span>
-                            <span>Outcome</span>
-                            <span>Shares</span>
-                            <span>Entry</span>
-                            <span>P&L</span>
-                            <span className="text-right">Action</span>
+                            <span className="col-span-2">{lang === 'en' ? 'Market' : 'Marché'}</span>
+                            <span>{lang === 'en' ? 'Outcome' : 'Issue'}</span>
+                            <span>{lang === 'en' ? 'Shares' : 'Parts'}</span>
+                            <span>{lang === 'en' ? 'Entry' : 'Entrée'}</span>
+                            <span>{lang === 'en' ? 'P&L' : 'P&L'}</span>
+                            <span className="text-right">{lang === 'en' ? 'Action' : 'Action'}</span>
                           </div>
                           {userPositions.map((pos) => {
                             const isPositive = pos.unrealizedPnl >= 0;
@@ -1811,7 +1816,7 @@ export default function Home() {
 
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div className="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
-                      <div className="text-[10px] text-slate-500">Win Rate</div>
+                      <div className="text-[10px] text-slate-500">{lang === 'en' ? 'Win Rate' : 'Taux Victoire'}</div>
                       <div className="font-mono font-bold text-emerald-400">{agent.win_rate_pct}%</div>
                     </div>
                     <div className="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
@@ -1819,7 +1824,7 @@ export default function Home() {
                       <div className="font-mono font-bold text-cyan-400">{agent.sharpe_ratio}</div>
                     </div>
                     <div className="bg-slate-900/60 p-2 rounded-xl border border-slate-800">
-                      <div className="text-[10px] text-slate-500">PnL Total</div>
+                      <div className="text-[10px] text-slate-500">{lang === 'en' ? 'Total PnL' : 'PnL Total'}</div>
                       <div className="font-mono font-bold text-emerald-400">+${agent.total_pnl_usdso.toLocaleString()}</div>
                     </div>
                   </div>
@@ -2102,7 +2107,7 @@ export default function Home() {
                 </div>
                 <div className="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-3 py-1.5 rounded-xl border border-emerald-500/30 flex items-center gap-2 shrink-0">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Protocol Revenue: Sustainable & Non-Inflationary</span>
+                  <span>{lang === 'en' ? 'Protocol Revenue: Sustainable & Non-Inflationary' : 'Revenus du Protocole : Durables & Non-Inflationnistes'}</span>
                 </div>
               </div>
 
