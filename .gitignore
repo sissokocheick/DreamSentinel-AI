@@ -31,3 +31,4 @@ Thumbs.db
 # Media binaries
 *.mp4
 *.mov
+!frontend/public/*.mp4

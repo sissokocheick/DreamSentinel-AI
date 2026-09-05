@@ -100,7 +100,7 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [showSubtitles, setShowSubtitles] = useState<boolean>(true);
-  const [videoMode, setVideoMode] = useState<'interactive' | 'external'>('external');
+  const [videoMode, setVideoMode] = useState<'screencast' | 'external' | 'interactive'>('screencast');
   const [urlInput, setUrlInput] = useState<string>(effectiveVideoUrl);
   const [duration, setDuration] = useState<number>(120);
 
@@ -192,9 +192,20 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
         preload="auto"
       />
 
-      {/* Mode Selector Toggle: Interactive 60fps Demo vs External Video (Loom/YouTube) */}
+      {/* Mode Selector Toggle: Screencast Montage (Real 60fps) vs YouTube vs Interactive Storyboard */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-2 rounded-2xl bg-slate-950/70 border border-white/[0.08]">
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-white/10 text-xs">
+        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-white/10 text-xs">
+          <button
+            onClick={() => setVideoMode('screencast')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+              videoMode === 'screencast'
+                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>{lang === 'en' ? '🎬 Real Screencast Montage' : '🎬 Montage Écran Réel'}</span>
+          </button>
           <button
             onClick={() => setVideoMode('external')}
             className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
@@ -203,8 +214,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Play className="w-3.5 h-3.5 text-purple-400" />
-            <span>{lang === 'en' ? '🎬 YouTube Pitch Video' : '🎬 Vidéo Démo YouTube'}</span>
+            <Play className="w-3.5 h-3.5 text-red-400" />
+            <span>{lang === 'en' ? '▶ YouTube Video' : '▶ Vidéo YouTube'}</span>
           </button>
           <button
             onClick={() => setVideoMode('interactive')}
@@ -214,8 +225,8 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>{lang === 'en' ? '✨ Interactive Storyboard (60 FPS)' : '✨ Storyboard Interactif (60 FPS)'}</span>
+            <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
+            <span>{lang === 'en' ? '✨ Interactive Storyboard' : '✨ Storyboard Interactif'}</span>
           </button>
         </div>
 
@@ -518,6 +529,65 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODE 3: REAL SCREENCAST MASTER MONTAGE (1080P 60FPS WITH VOICE & LOWER-THIRDS) */}
+      {videoMode === 'screencast' && (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {lang === 'en' ? 'Screencast Master Montage (1080p 60fps)' : 'Montage Écran Réel (1080p 60fps)'}
+              </span>
+              <span className="text-[11px] text-slate-400 hidden sm:inline font-mono">
+                Somnia L1 • 105,420 TPS
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={lang === 'fr' ? '/dreamsentinel_montage_demo_fr.mp4' : '/dreamsentinel_montage_demo_en.mp4'}
+                download={`dreamsentinel_demo_${lang}.mp4`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 hover:text-purple-200 text-xs font-bold transition-all active:scale-95 shadow-sm"
+                title="Download Master Video MP4"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{lang === 'en' ? 'Download MP4 (12 MB)' : 'Télécharger MP4 (12 Mo)'}</span>
+              </a>
+              <button
+                onClick={() => setVideoMode('external')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 hover:text-red-200 text-xs font-bold transition-all active:scale-95 shadow-sm"
+              >
+                <Play className="w-3.5 h-3.5" />
+                <span>YouTube ↗</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/15 shadow-2xl">
+            <video
+              src={lang === 'fr' ? '/dreamsentinel_montage_demo_fr.mp4' : '/dreamsentinel_montage_demo_en.mp4'}
+              controls
+              autoPlay
+              playsInline
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/[0.08] flex items-center justify-between text-xs text-slate-300">
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
+              <span>
+                {lang === 'en'
+                  ? 'Includes: Terminal 105k TPS, VIP Mode, Kelly Sizing, My Positions Cash Out, Arbitrage Radar, Backtest, PvP Duels, ERC-4626 Vaults & Telegram Bot'
+                  : 'Inclus : Terminal 105k TPS, Mode VIP, Sizing Kelly, Sortie Anticipée, Radar Arbitrage, Backtest, Duels PvP, Vaults ERC-4626 & Bot Telegram'}
+              </span>
+            </span>
+            <span className="text-[11px] text-purple-400 font-mono font-bold shrink-0 ml-2">
+              {lang === 'fr' ? '1m 36s' : '2m 08s'}
+            </span>
           </div>
         </div>
       )}
