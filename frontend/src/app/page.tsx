@@ -211,7 +211,8 @@ export default function Home() {
   const [showFaucetModal, setShowFaucetModal] = useState<boolean>(false);
   const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
   const [videoActiveStep, setVideoActiveStep] = useState<number>(0);
-  const [customVideoUrl, setCustomVideoUrl] = useState<string>('');
+  const DEFAULT_DEMO_VIDEO_URL = 'https://youtu.be/Bw-AFazHjrg';
+  const [customVideoUrl, setCustomVideoUrl] = useState<string>(DEFAULT_DEMO_VIDEO_URL);
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
@@ -232,18 +233,23 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Load saved video URL from localStorage if any
+  // Load saved video URL from localStorage if any, otherwise default to official YouTube demo
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('dreamsentinel_video_url');
-      if (saved) setCustomVideoUrl(saved);
+      if (saved && saved.trim().length > 0) {
+        setCustomVideoUrl(saved.trim());
+      } else {
+        setCustomVideoUrl(DEFAULT_DEMO_VIDEO_URL);
+      }
     }
   }, []);
 
   const handleSaveVideoUrl = (url: string) => {
-    setCustomVideoUrl(url);
+    const finalUrl = url.trim() || DEFAULT_DEMO_VIDEO_URL;
+    setCustomVideoUrl(finalUrl);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('dreamsentinel_video_url', url);
+      localStorage.setItem('dreamsentinel_video_url', finalUrl);
     }
     toast.success(lang === 'en' ? 'Video link updated!' : 'Lien vidéo mis à jour !');
   };

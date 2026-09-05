@@ -14,7 +14,8 @@
 ## 🌐 Live Links & Video Walkthrough
 
 - 🚀 **Live Production Terminal**: [https://dream-sentinel-ai.vercel.app](https://dream-sentinel-ai.vercel.app)
-- 🎬 **In-App Video Demo & Audio Voiceover**: Click `[ 🎬 Video Demo ]` on the live platform to watch the 60 FPS interactive animated video with Studio AI Voiceover (English & French).
+- 🎬 **Official YouTube Video Demo**: [https://youtu.be/Bw-AFazHjrg](https://youtu.be/Bw-AFazHjrg)
+- 🎮 **In-App Interactive Demo & Audio Voiceover**: Click `[ 🎬 Video Demo ]` on the live platform to watch the embedded YouTube pitch or run the 60 FPS interactive demo with Studio AI Voiceover (English & French).
 - 📄 **Official Video Script & Storyboard**: [`VIDEO_SCRIPT.md`](./VIDEO_SCRIPT.md)
 - 🎙️ **Studio Voiceover MP3 (English)**: [`frontend/public/voiceover_en.mp3`](./frontend/public/voiceover_en.mp3)
 - 🎙️ **Studio Voiceover MP3 (French)**: [`frontend/public/voiceover_fr.mp3`](./frontend/public/voiceover_fr.mp3)

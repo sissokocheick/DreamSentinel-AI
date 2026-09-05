@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
@@ -60,22 +60,55 @@ const SUBTITLES_FR: { start: number; end: number; text: string }[] = [
   { start: 110, end: 135, text: "DreamSentinel AI apporte la finance quantitative aux marchés de prédiction sur Somnia. Merci beaucoup !" }
 ];
 
+const DEFAULT_DEMO_VIDEO_URL = 'https://youtu.be/Bw-AFazHjrg';
+
+const getEmbedUrl = (rawUrl: string): string => {
+  if (!rawUrl) return '';
+  const url = rawUrl.trim();
+  if (url.includes('youtu.be/')) {
+    const id = url.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
+    return `https://www.youtube.com/embed/${id}?rel=0`;
+  }
+  if (url.includes('youtube.com/watch')) {
+    try {
+      const parsed = new URL(url);
+      const v = parsed.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}?rel=0`;
+    } catch {
+      const id = url.split('watch?v=')[1]?.split('&')[0]?.split('?')[0];
+      return `https://www.youtube.com/embed/${id}?rel=0`;
+    }
+  }
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+  if (url.includes('loom.com/share/')) {
+    return url.replace('share', 'embed');
+  }
+  return url;
+};
+
 export const InteractiveVideoPlayer: React.FC<Props> = ({
   lang,
   onNavigateTab,
   customVideoUrl,
   onSaveVideoUrl
 }) => {
+  const effectiveVideoUrl = customVideoUrl || DEFAULT_DEMO_VIDEO_URL;
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [showSubtitles, setShowSubtitles] = useState<boolean>(true);
-  const [videoMode, setVideoMode] = useState<'interactive' | 'external'>(
-    customVideoUrl ? 'external' : 'interactive'
-  );
-  const [urlInput, setUrlInput] = useState<string>(customVideoUrl || '');
+  const [videoMode, setVideoMode] = useState<'interactive' | 'external'>('external');
+  const [urlInput, setUrlInput] = useState<string>(effectiveVideoUrl);
   const [duration, setDuration] = useState<number>(120);
+
+  useEffect(() => {
+    if (customVideoUrl) {
+      setUrlInput(customVideoUrl);
+    }
+  }, [customVideoUrl]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const voiceSrc = lang === 'fr' ? '/voiceover_fr.mp3' : '/voiceover_en.mp3';
@@ -163,17 +196,6 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-2 rounded-2xl bg-slate-950/70 border border-white/[0.08]">
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-white/10 text-xs">
           <button
-            onClick={() => setVideoMode('interactive')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
-              videoMode === 'interactive'
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>{lang === 'en' ? 'Interactive Demo (60 FPS)' : 'Démo Vidéo Interactive (60 FPS)'}</span>
-          </button>
-          <button
             onClick={() => setVideoMode('external')}
             className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
               videoMode === 'external'
@@ -182,7 +204,18 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
             }`}
           >
             <Play className="w-3.5 h-3.5 text-purple-400" />
-            <span>{lang === 'en' ? 'External Video (Loom / YouTube)' : 'Lien Externe (Loom / YouTube)'}</span>
+            <span>{lang === 'en' ? '🎬 YouTube Pitch Video' : '🎬 Vidéo Démo YouTube'}</span>
+          </button>
+          <button
+            onClick={() => setVideoMode('interactive')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+              videoMode === 'interactive'
+                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>{lang === 'en' ? '✨ Interactive Storyboard (60 FPS)' : '✨ Storyboard Interactif (60 FPS)'}</span>
           </button>
         </div>
 
@@ -489,24 +522,39 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
         </div>
       )}
 
-      {/* MODE 2: EXTERNAL VIDEO EMBED (LOOM / YOUTUBE) */}
+      {/* MODE 2: EXTERNAL VIDEO EMBED (OFFICIAL YOUTUBE PITCH / CUSTOM LOOM) */}
       {videoMode === 'external' && (
         <div className="space-y-3">
+          {/* Top Bar with YouTube direct link and Official Badge */}
+          <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold font-mono">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                {lang === 'en' ? 'Official Pitch Walkthrough' : 'Pitch Démo Officiel'}
+              </span>
+              <span className="text-[11px] text-slate-400 hidden sm:inline font-mono">
+                Somnia × DreamDEX Hackathon
+              </span>
+            </div>
+            <a
+              href={effectiveVideoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 hover:text-red-200 text-xs font-bold transition-all active:scale-95 shadow-sm"
+              title="Open video directly on YouTube"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>{lang === 'en' ? 'Open on YouTube' : 'Ouvrir sur YouTube'}</span>
+            </a>
+          </div>
+
           <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/15 shadow-2xl flex items-center justify-center">
-            {customVideoUrl ? (
+            {effectiveVideoUrl ? (
               <iframe
-                src={
-                  customVideoUrl.includes('youtube.com/watch?v=')
-                    ? customVideoUrl.replace('watch?v=', 'embed/')
-                    : customVideoUrl.includes('youtu.be/')
-                    ? `https://www.youtube.com/embed/${customVideoUrl.split('youtu.be/')[1]}`
-                    : customVideoUrl.includes('loom.com/share/')
-                    ? customVideoUrl.replace('share', 'embed')
-                    : customVideoUrl
-                }
+                src={getEmbedUrl(effectiveVideoUrl)}
                 title="DreamSentinel Video Walkthrough"
                 className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             ) : (
@@ -532,14 +580,27 @@ export const InteractiveVideoPlayer: React.FC<Props> = ({
           <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/[0.08] space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
               <span>{lang === 'en' ? 'Embed your Loom / YouTube Pitch Video:' : 'Intégrer votre vidéo Loom / YouTube :'}</span>
-              <span className="text-[10px] text-slate-500 font-mono">Auto-Saved</span>
+              <div className="flex items-center gap-2">
+                {urlInput !== DEFAULT_DEMO_VIDEO_URL && (
+                  <button
+                    onClick={() => {
+                      setUrlInput(DEFAULT_DEMO_VIDEO_URL);
+                      onSaveVideoUrl(DEFAULT_DEMO_VIDEO_URL);
+                    }}
+                    className="text-[10px] text-purple-400 hover:text-purple-300 underline font-mono"
+                  >
+                    {lang === 'en' ? 'Reset to Official Demo' : 'Rétablir la démo officielle'}
+                  </button>
+                )}
+                <span className="text-[10px] text-slate-500 font-mono">Auto-Saved</span>
+              </div>
             </div>
             <div className="flex gap-2">
               <input
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="https://www.loom.com/share/... ou https://www.youtube.com/watch?v=..."
+                placeholder="https://youtu.be/Bw-AFazHjrg"
                 className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500"
               />
               <button
