@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, Cpu, Zap, Shield, Bot, LineChart, 
   Wallet, Award, Activity, ArrowUpRight, Sparkles, MessageSquare, 
   Layers, CheckCircle, AlertTriangle, RefreshCw, Send, Check, ChevronRight, DollarSign, Swords,
-  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft, Volume2, VolumeX,
+  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft, ChevronDown, Volume2, VolumeX,
   Calculator, Smartphone, Share2
 } from 'lucide-react';
 import { Market, AgentProfile, ThoughtLog, SwarmStatus, ActionCard, CopilotMessage } from '../types';
@@ -218,6 +218,19 @@ export default function Home() {
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [showKellyModal, setShowKellyModal] = useState<boolean>(false);
   const [showTelegramModal, setShowTelegramModal] = useState<boolean>(false);
+  const [showToolsDropdown, setShowToolsDropdown] = useState<boolean>(false);
+  const toolsDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close tools dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target as Node)) {
+        setShowToolsDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Load saved video URL from localStorage if any
   useEffect(() => {
@@ -769,33 +782,33 @@ export default function Home() {
       {/* Top Banner: Somnia Hackathon Header */}
       <header className="border-b border-surfaceBorder bg-surface/90 backdrop-blur-md sticky top-0 z-50 shadow-md">
         {/* ROW 1: Logo & Branding on Left, Web3 Wallet Cluster & Disconnect on Right */}
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* LEFT: Logo & Branding */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/20 flex-shrink-0 relative group">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/20 flex-shrink-0 relative group">
               <img src="/logo.jpg" alt="DreamSentinel Logo" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-bold text-sm sm:text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
                   DreamSentinel AI
                 </span>
-                <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hidden xs:inline-block">
                   {t('brand_tag')}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Web3 Status, Language, Faucet, Contracts & Wallet */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* RIGHT: Web3 Status, Language, Ecosystem Tools, Demo & Wallet */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Language Switcher: EN / FR */}
-            <div className="flex items-center rounded-xl bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs font-mono shadow-inner">
+            <div className="flex items-center rounded-xl bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs font-mono shadow-inner shrink-0">
               <button
                 onClick={() => toggleLanguage('en')}
-                className={`px-2 py-1 rounded-lg transition-all ${
+                className={`px-1.5 sm:px-2 py-1 rounded-lg transition-all text-xs ${
                   lang === 'en' 
                     ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200'
@@ -806,7 +819,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => toggleLanguage('fr')}
-                className={`px-2 py-1 rounded-lg transition-all ${
+                className={`px-1.5 sm:px-2 py-1 rounded-lg transition-all text-xs ${
                   lang === 'fr' 
                     ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200'
@@ -817,39 +830,174 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Somnia Video Demo Modal Trigger */}
+            {/* Somnia Video Demo Modal Trigger (visible on sm+) */}
             <button
               onClick={() => setShowVideoModal(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-xs text-purple-200 font-bold transition-all shadow-sm active:scale-95 group"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-xs text-purple-200 font-bold transition-all shadow-sm active:scale-95 group shrink-0"
               title={lang === 'en' ? 'Watch Video Walkthrough & Interactive Demo' : 'Voir la Démonstration Vidéo et le Pitch'}
             >
               <Film className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
               <span>{t('video_btn')}</span>
             </button>
 
-            {/* Somnia Faucet Modal Trigger */}
-            <button
-              onClick={() => setShowFaucetModal(true)}
-              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 font-semibold transition-all shadow-sm active:scale-95"
-              title={lang === 'en' ? 'Get free STT tokens on Somnia Faucets' : 'Obtenir des STT gratuits sur les Faucets Somnia'}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden lg:inline">{t('faucet_btn')}</span>
-            </button>
+            {/* Ecosystem & Tools Dropdown Menu */}
+            <div className="relative shrink-0" ref={toolsDropdownRef}>
+              <button
+                onClick={() => {
+                  setShowToolsDropdown(prev => !prev);
+                  playWeb3Sound('click', soundEnabled);
+                }}
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-sm active:scale-95 ${
+                  showToolsDropdown
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-500/20'
+                    : 'bg-slate-900/90 hover:bg-slate-800 border-slate-700/80 hover:border-cyan-500/40 text-slate-300 hover:text-white'
+                }`}
+                title={t('ecosystem_tools')}
+              >
+                <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                <span>{t('ecosystem_btn')}</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">4</span>
+                <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${showToolsDropdown ? 'rotate-180 text-cyan-300' : ''}`} />
+              </button>
 
-            {/* On-Chain Contracts Button */}
-            <button
-              onClick={() => setShowContractsModal(true)}
-              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 font-semibold transition-all shadow-sm"
-              title="Afficher les contrats déployés sur Somnia Shannon Testnet"
-            >
-              <LinkIcon className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden lg:inline">{t('onchain_contracts_btn')}</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">4</span>
-            </button>
+              {showToolsDropdown && (
+                <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-slate-950/98 border border-cyan-500/40 rounded-2xl shadow-2xl p-2.5 z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 space-y-1">
+                  <div className="px-2.5 py-1.5 border-b border-white/[0.08] mb-1 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                      {t('ecosystem_tools')}
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      Somnia 50312
+                    </span>
+                  </div>
 
-            {/* Somnia Shannon Network & Live Block Indicator */}
-            <div className="hidden xl:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono">
+                  {/* Kelly Criterion Simulator */}
+                  <button
+                    onClick={() => {
+                      setShowKellyModal(true);
+                      setShowToolsDropdown(false);
+                      playWeb3Sound('click', soundEnabled);
+                    }}
+                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 group-hover:bg-purple-500/20">
+                      <Calculator className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-slate-200 group-hover:text-purple-300 flex items-center justify-between">
+                        <span>{t('kelly_btn')}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">Quant</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {lang === 'en' ? 'Optimal capital sizing & mathematical EV' : 'Optimisation du capital & calcul de l\'EV'}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Telegram Mini-App */}
+                  <button
+                    onClick={() => {
+                      setShowTelegramModal(true);
+                      setShowToolsDropdown(false);
+                      playWeb3Sound('click', soundEnabled);
+                    }}
+                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/20">
+                      <Smartphone className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-slate-200 group-hover:text-cyan-300 flex items-center justify-between">
+                        <span>{t('telegram_btn')}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">Mobile</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {lang === 'en' ? 'Fast mobile trading & instant arbitrage bot' : 'Trading mobile & alertes push d\'arbitrage'}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Somnia STT Faucet */}
+                  <button
+                    onClick={() => {
+                      setShowFaucetModal(true);
+                      setShowToolsDropdown(false);
+                      playWeb3Sound('click', soundEnabled);
+                    }}
+                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:bg-amber-500/20">
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-slate-200 group-hover:text-amber-300 flex items-center justify-between">
+                        <span>{t('faucet_btn')}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">Gas STT</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {lang === 'en' ? 'Claim testnet tokens on Google Cloud & Thirdweb' : 'Réclamez des STT sur Google Cloud & Thirdweb'}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* On-Chain Contracts */}
+                  <button
+                    onClick={() => {
+                      setShowContractsModal(true);
+                      setShowToolsDropdown(false);
+                      playWeb3Sound('click', soundEnabled);
+                    }}
+                    className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center shrink-0 group-hover:bg-teal-500/20">
+                      <LinkIcon className="w-4 h-4 text-teal-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-slate-200 group-hover:text-teal-300 flex items-center justify-between">
+                        <span>{t('onchain_contracts_btn')}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 font-mono">4 Verified</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {lang === 'en' ? 'View 4 deployed contracts on Somnia Shannon' : '4 contrats intelligents vérifiés sur Somnia'}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Video Walkthrough (mobile fallback) */}
+                  <button
+                    onClick={() => {
+                      setShowVideoModal(true);
+                      setShowToolsDropdown(false);
+                      playWeb3Sound('click', soundEnabled);
+                    }}
+                    className="w-full flex sm:hidden items-center gap-3 p-2 rounded-xl hover:bg-slate-900/90 text-left transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 group-hover:bg-purple-500/20">
+                      <Film className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-slate-200 group-hover:text-purple-300 flex items-center justify-between">
+                        <span>{t('video_btn')}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">Demo</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {lang === 'en' ? 'Watch video walkthrough & pitch' : 'Voir la vidéo et le pitch'}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Network Info Footer */}
+                  <div className="pt-2 px-2 border-t border-white/[0.08] flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                    <span>Somnia Shannon (50312)</span>
+                    <span className="text-cyan-400 font-bold">#{somniaBlock.toLocaleString()}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Somnia Shannon Network & Live Block Indicator (visible on very wide screens 2xl+) */}
+            <div className="hidden 2xl:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono shrink-0">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span>Somnia (50312)</span>
               <span className="text-[10px] text-slate-400 font-mono border-l border-white/10 pl-2">
@@ -857,43 +1005,17 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Kelly Criterion Simulator Trigger */}
-            <button
-              onClick={() => {
-                setShowKellyModal(true);
-                playWeb3Sound('click', soundEnabled);
-              }}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-xs text-purple-300 font-semibold transition-all shadow-sm active:scale-95"
-              title={t('kelly_modal_title')}
-            >
-              <Calculator className="w-3.5 h-3.5 text-purple-400" />
-              <span>{t('kelly_btn')}</span>
-            </button>
-
-            {/* Telegram Mini-App Trigger */}
-            <button
-              onClick={() => {
-                setShowTelegramModal(true);
-                playWeb3Sound('click', soundEnabled);
-              }}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 font-semibold transition-all shadow-sm active:scale-95"
-              title={t('telegram_modal_title')}
-            >
-              <Smartphone className="w-3.5 h-3.5 text-cyan-400" />
-              <span>{t('telegram_btn')}</span>
-            </button>
-
-            {/* Judge 1-Click Demo VIP Access Button */}
+            {/* Judge 1-Click Demo VIP Access Button (Priority #1 CTA: ALWAYS FULLY VISIBLE) */}
             <button
               onClick={handleActivateJudgeDemo}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shadow-sm active:scale-95 border ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition-all shadow-sm active:scale-95 border shrink-0 whitespace-nowrap ${
                 isJudgeDemoActive
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-emerald-500/20'
                   : 'bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-cyan-500/20 hover:from-amber-500/30 hover:to-cyan-500/30 text-amber-300 border-amber-500/40'
               }`}
               title={t('judge_demo_btn')}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
               <span>{isJudgeDemoActive ? t('judge_demo_active') : t('judge_demo_btn')}</span>
             </button>
 
@@ -904,7 +1026,7 @@ export default function Home() {
                 setSoundEnabled(next);
                 if (next) playWeb3Sound('click', true);
               }}
-              className={`p-2 rounded-xl border text-xs transition-all active:scale-95 ${
+              className={`p-2 rounded-xl border text-xs transition-all active:scale-95 shrink-0 ${
                 soundEnabled ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300' : 'bg-slate-900 border-white/10 text-slate-500'
               }`}
               title={t('sound_toggle')}
@@ -912,14 +1034,14 @@ export default function Home() {
               {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
             </button>
 
-            {/* WALLET BUTTON OR ACCOUNT PILL + DISCONNECT BUTTON */}
+            {/* WALLET BUTTON OR ACCOUNT PILL + DISCONNECT BUTTON (NEVER CUT OFF) */}
             {walletConnected ? (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div className="flex items-center rounded-xl bg-slate-900/90 border border-cyan-500/40 p-1 gap-1 shadow-sm shrink-0">
                   {/* Balance Badge */}
                   <div 
                     onClick={() => setShowAccountModal(true)}
-                    className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden sm:flex items-center gap-1 cursor-pointer hover:bg-cyan-900/40 transition-colors"
+                    className="px-2.5 py-1 rounded-lg bg-cyan-950/40 text-xs font-mono text-emerald-400 font-bold hidden md:flex items-center gap-1 cursor-pointer hover:bg-cyan-900/40 transition-colors shrink-0"
                     title={lang === 'en' ? 'Click to view account' : 'Cliquer pour voir le compte'}
                   >
                     <span>${usdsoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -929,31 +1051,31 @@ export default function Home() {
                   {/* Account Pill with Dropdown indicator */}
                   <button
                     onClick={() => setShowAccountModal(true)}
-                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg bg-surfaceBorder/80 hover:bg-slate-800 text-xs text-cyan-300 font-mono font-bold transition-all border border-slate-700 hover:border-cyan-500/50"
+                    className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-surfaceBorder/80 hover:bg-slate-800 text-xs text-cyan-300 font-mono font-bold transition-all border border-slate-700 hover:border-cyan-500/50 shrink-0"
                     title={lang === 'en' ? 'Account & wallet details' : 'Gérer le compte et portefeuille'}
                   >
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                     <span>{walletAddress}</span>
-                    <ChevronRight className="w-3 h-3 text-slate-400 rotate-90" />
+                    <ChevronRight className="w-3 h-3 text-slate-400 rotate-90 shrink-0" />
                   </button>
                 </div>
 
                 {/* Highly Visible Dedicated Disconnect Button */}
                 <button
                   onClick={disconnectWallet}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/50 hover:border-rose-400 text-rose-300 hover:text-white text-xs font-black transition-all shadow-md shadow-rose-500/10 active:scale-95 shrink-0"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/50 hover:border-rose-400 text-rose-300 hover:text-white text-xs font-black transition-all shadow-md shadow-rose-500/10 active:scale-95 shrink-0"
                   title={lang === 'en' ? 'Disconnect wallet' : 'Déconnecter le portefeuille'}
                 >
-                  <LogOut className="w-3.5 h-3.5 text-rose-400" />
-                  <span>{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
+                  <LogOut className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                  <span className="hidden sm:inline">{lang === 'en' ? 'Disconnect' : 'Déconnecter'}</span>
                 </button>
               </div>
             ) : (
               <button
                 onClick={handleConnectWallet}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-500 via-teal-400 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-black shadow-md shadow-cyan-500/25 transition-all active:scale-[0.98]"
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-500 via-teal-400 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-black shadow-md shadow-cyan-500/25 transition-all active:scale-[0.98] shrink-0 whitespace-nowrap"
               >
-                <Wallet className="w-4 h-4" />
+                <Wallet className="w-4 h-4 shrink-0" />
                 <span>{t('connect_wallet')}</span>
               </button>
             )}
