@@ -478,12 +478,12 @@ export function BacktestSimulator({ lang = 'en' }: BacktestSimulatorProps) {
                     <thead className="sticky top-0 bg-slate-900/90 text-slate-400">
                       <tr>
                         <th className="px-3 py-2 text-left">#</th>
-                        <th className="px-3 py-2 text-left">Marché</th>
-                        <th className="px-3 py-2 text-left">Side</th>
-                        <th className="px-3 py-2 text-right">Prix</th>
-                        <th className="px-3 py-2 text-right">Edge</th>
-                        <th className="px-3 py-2 text-right">Mise</th>
-                        <th className="px-3 py-2 text-right">P&L</th>
+                        <th className="px-3 py-2 text-left">{lang === 'en' ? 'Market' : 'Marché'}</th>
+                        <th className="px-3 py-2 text-left">{lang === 'en' ? 'Side' : 'Side'}</th>
+                        <th className="px-3 py-2 text-right">{lang === 'en' ? 'Price' : 'Prix'}</th>
+                        <th className="px-3 py-2 text-right">{lang === 'en' ? 'Edge' : 'Edge'}</th>
+                        <th className="px-3 py-2 text-right">{lang === 'en' ? 'Stake' : 'Mise'}</th>
+                        <th className="px-3 py-2 text-right">{lang === 'en' ? 'P&L' : 'P&L'}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -515,7 +515,7 @@ export function BacktestSimulator({ lang = 'en' }: BacktestSimulatorProps) {
               onClick={() => { setResult(null); setProgress(0); }}
               className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1.5 transition-colors"
             >
-              <RotateCcw className="w-3.5 h-3.5" />Réinitialiser les résultats
+              <RotateCcw className="w-3.5 h-3.5" />{lang === 'en' ? 'Reset results' : 'Réinitialiser les résultats'}
             </button>
           </>
         )}

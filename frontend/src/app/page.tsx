@@ -124,23 +124,38 @@ const GenericWeb3Icon = ({ className = "w-7 h-7" }: { className?: string }) => (
   </svg>
 );
 
+const getCopilotWelcomeText = (targetLang: Language) => targetLang === 'en'
+  ? '👋 **Welcome to DreamSentinel AI!** I am your autonomous trading copilot for **DreamDEX Event Contracts** on **Somnia L1**.\n\nI continuously monitor the orderbook and compute Bayesian probabilities in real-time. Ask me a question or click on an opportunity!'
+  : '👋 **Bienvenue sur DreamSentinel AI !** Je suis votre copilote de trading autonome pour les **Event Contracts DreamDEX** sur **Somnia L1**.\n\nJe surveille le carnet d\'ordres en continu et calcule les probabilités bayésiennes en temps réel. Posez-moi une question ou cliquez sur une opportunité !';
+
 export default function Home() {
   // Internationalization (Default English, browser auto-detect or localStorage)
   const [lang, setLang] = useState<Language>('en');
 
+  // Copilot Chat state
+  const [copilotInput, setCopilotInput] = useState<string>('');
+  const [copilotMessages, setCopilotMessages] = useState<CopilotMessage[]>([
+    {
+      id: 'm1',
+      sender: 'copilot',
+      text: getCopilotWelcomeText('en'),
+      timestamp: Date.now()
+    }
+  ]);
+  const [isCopilotLoading, setIsCopilotLoading] = useState<boolean>(false);
+  const chatBottomRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('dreamsentinel_lang') as Language;
-      if (saved === 'en' || saved === 'fr') {
-        setLang(saved);
-      } else {
-        const browserLang = navigator.language?.slice(0, 2).toLowerCase();
-        if (browserLang === 'fr') {
-          setLang('fr');
-        } else {
-          setLang('en');
-        }
-      }
+      const initial = saved === 'en' || saved === 'fr' ? saved : (navigator.language?.slice(0, 2).toLowerCase() === 'fr' ? 'fr' : 'en');
+      setLang(initial);
+      setCopilotMessages([{
+        id: 'm1',
+        sender: 'copilot',
+        text: getCopilotWelcomeText(initial),
+        timestamp: Date.now()
+      }]);
     }
   }, []);
 
@@ -149,6 +164,15 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('dreamsentinel_lang', newLang);
     }
+    setCopilotMessages(prev => {
+      if (prev.length === 1 && prev[0].id === 'm1') {
+        return [{
+          ...prev[0],
+          text: getCopilotWelcomeText(newLang)
+        }];
+      }
+      return prev;
+    });
   };
 
   const t = (key: keyof typeof translations['en']): string => {
@@ -596,7 +620,7 @@ export default function Home() {
   // Confirm Deposit into Vault
   const handleConfirmDeposit = async () => {
     if (depositAmount <= 0 || depositAmount > usdsoBalance) {
-      toast.error('Solde insuffisant ou montant invalide');
+      toast.error(lang === 'en' ? 'Insufficient balance or invalid amount' : 'Solde insuffisant ou montant invalide');
       return;
     }
     setIsDepositing(true);
@@ -607,24 +631,13 @@ export default function Home() {
       const vaultName = selectedVaultDeposit?.symbol || 'Vault';
       setSelectedVaultDeposit(null);
       playWeb3Sound('success', soundEnabled);
-      toast.success(`Dépôt réussi dans ${vaultName} !`, {
-        description: `Tx: 0x${Math.random().toString(16).slice(2, 10)}... validée sur Somnia Shannon L1`,
+      toast.success(lang === 'en' ? `Deposit successful in ${vaultName}!` : `Dépôt réussi dans ${vaultName} !`, {
+        description: lang === 'en'
+          ? `Tx: 0x${Math.random().toString(16).slice(2, 10)}... confirmed on Somnia Shannon L1`
+          : `Tx: 0x${Math.random().toString(16).slice(2, 10)}... validée sur Somnia Shannon L1`,
       });
     }, 1200);
   };
-
-  // Copilot Chat
-  const [copilotInput, setCopilotInput] = useState<string>('');
-  const [copilotMessages, setCopilotMessages] = useState<CopilotMessage[]>([
-    {
-      id: 'm1',
-      sender: 'copilot',
-      text: '👋 **Bienvenue sur DreamSentinel AI !** Je suis votre copilote de trading autonome pour les **Event Contracts DreamDEX** sur **Somnia L1**.\n\nJe surveille le carnet d\'ordres en continu et calcule les probabilités bayésiennes en temps réel. Posez-moi une question ou cliquez sur une opportunité !',
-      timestamp: Date.now()
-    }
-  ]);
-  const [isCopilotLoading, setIsCopilotLoading] = useState<boolean>(false);
-  const chatBottomRef = useRef<HTMLDivElement>(null);
 
   // Selected active market object
   const currentMarket = markets.find(m => m.market_id === selectedMarketId) || markets[0];
@@ -715,7 +728,9 @@ export default function Home() {
       };
       setUserPositions(prev => [newPos, ...prev]);
 
-      setTradeSuccessMsg(`✅ Ordre exécuté sur Somnia L1 : Achat de ${amountVal} USDso de ${outcomeStr} @ $${priceVal.toFixed(2)}.`);
+      setTradeSuccessMsg(lang === 'en'
+        ? `✅ Order executed on Somnia L1: Bought ${amountVal} USDso of ${outcomeStr} @ $${priceVal.toFixed(2)}.`
+        : `✅ Ordre exécuté sur Somnia L1 : Achat de ${amountVal} USDso de ${outcomeStr} @ $${priceVal.toFixed(2)}.`);
       setTimeout(() => setTradeSuccessMsg(null), 5000);
     }, 400);
   };
@@ -2060,9 +2075,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-surfaceBorder/60 py-6 px-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-          <p>© 2026 DreamSentinel AI. Conçu pour le Hackathon Somnia × DreamDEX Event Contracts.</p>
+          <p>{lang === 'en' ? '© 2026 DreamSentinel AI. Engineered for the Somnia × DreamDEX Event Contracts Hackathon.' : '© 2026 DreamSentinel AI. Conçu pour le Hackathon Somnia × DreamDEX Event Contracts.'}</p>
           <div className="flex items-center gap-4">
-            <a href="https://docs.dreamdex.io/developers/event-contracts" target="_blank" className="hover:text-cyan-400 transition-colors">Documentation DreamDEX</a>
+            <a href="https://docs.dreamdex.io/developers/event-contracts" target="_blank" className="hover:text-cyan-400 transition-colors">{lang === 'en' ? 'DreamDEX Documentation' : 'Documentation DreamDEX'}</a>
             <a href="https://github.com/somnia-chain/dreamdex-bot-kit" target="_blank" className="hover:text-cyan-400 transition-colors">DreamDEX Bot Kit</a>
             <a href="https://somnia.network" target="_blank" className="hover:text-cyan-400 transition-colors">Somnia L1</a>
           </div>
@@ -2518,10 +2533,10 @@ export default function Home() {
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(item.address);
-                        toast.success('Adresse copiée dans le presse-papier !');
+                        toast.success(lang === 'en' ? 'Address copied to clipboard!' : 'Adresse copiée dans le presse-papier !');
                       }}
                       className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 transition-all border border-slate-700"
-                      title="Copier l'adresse"
+                      title={lang === 'en' ? 'Copy address' : "Copier l'adresse"}
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
@@ -2540,14 +2555,14 @@ export default function Home() {
             </div>
 
             <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center justify-between">
-              <span>✅ Tous les Smart Contracts sont déployés et opérationnels.</span>
+              <span>{lang === 'en' ? '✅ All Smart Contracts are verified and operational on Somnia Shannon.' : '✅ Tous les Smart Contracts sont déployés et opérationnels sur Somnia Shannon.'}</span>
               <a
                 href="https://shannon-explorer.somnia.network/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline font-semibold hover:text-emerald-300"
               >
-                Ouvrir Shannon Explorer ↗
+                {lang === 'en' ? 'Open Shannon Explorer ↗' : 'Ouvrir Shannon Explorer ↗'}
               </a>
             </div>
           </div>
@@ -2707,16 +2722,16 @@ export default function Home() {
                   {selectedVaultDeposit.symbol}
                 </span>
                 <h3 className="text-lg font-bold text-slate-100">
-                  Dépôt dans le Vault
+                  {lang === 'en' ? 'Deposit into Vault' : 'Dépôt dans le Vault'}
                 </h3>
               </div>
               <p className="text-xs text-slate-400">
-                Gestion automatisée par l'Essaim IA • Rendement : <strong className="text-emerald-400">{selectedVaultDeposit.apy}</strong>
+                {lang === 'en' ? 'Automated management by AI Swarm • Target APY:' : "Gestion automatisée par l'Essaim IA • Rendement :"} <strong className="text-emerald-400">{selectedVaultDeposit.apy}</strong>
               </p>
             </div>
 
             <div className="space-y-3">
-              <label className="text-xs font-semibold text-slate-300">Montant en USDso à allouer :</label>
+              <label className="text-xs font-semibold text-slate-300">{lang === 'en' ? 'USDso Amount to allocate:' : 'Montant en USDso à allouer :'}</label>
               <div className="relative">
                 <input
                   type="number"
@@ -2745,15 +2760,15 @@ export default function Home() {
 
               <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs font-mono">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Parts de Vault estimées :</span>
+                  <span className="text-slate-400">{lang === 'en' ? 'Estimated Vault shares:' : 'Parts de Vault estimées :'}</span>
                   <span className="text-cyan-300 font-bold">{depositAmount.toFixed(2)} {selectedVaultDeposit.symbol}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Solde restant disponible :</span>
+                  <span className="text-slate-400">{lang === 'en' ? 'Remaining available balance:' : 'Solde restant disponible :'}</span>
                   <span className="text-slate-200">${(usdsoBalance - depositAmount).toLocaleString()} USDso</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Frais de protocole :</span>
+                  <span className="text-slate-400">{lang === 'en' ? 'Protocol fee:' : 'Frais de protocole :'}</span>
                   <span className="text-emerald-400">0.00% (Hackathon Promo)</span>
                 </div>
               </div>
@@ -2771,10 +2786,10 @@ export default function Home() {
               {isDepositing ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Validation de la transaction sur Somnia...</span>
+                  <span>{lang === 'en' ? 'Validating transaction on Somnia L1...' : 'Validation de la transaction sur Somnia...'}</span>
                 </>
               ) : (
-                <span>Confirmer le Dépôt de ${depositAmount} USDso</span>
+                <span>{lang === 'en' ? `Confirm Deposit of $${depositAmount} USDso` : `Confirmer le Dépôt de ${depositAmount} $ USDso`}</span>
               )}
             </button>
           </div>

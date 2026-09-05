@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { X, Sparkles, TrendingUp, AlertTriangle, ShieldCheck, ArrowRight, Calculator } from 'lucide-react';
@@ -176,7 +176,7 @@ export function KellySimulatorModal({
         <div className="flex items-center justify-between gap-3 pt-2 relative z-10">
           <div className="text-xs text-slate-400 flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Formule exécutée par l'agent <strong>Bayesian Arb</strong> sur Somnia L1.</span>
+            <span>{lang === 'en' ? 'Formula computed by Bayesian Arb agent on Somnia L1.' : "Formule exécutée par l'agent Bayesian Arb sur Somnia L1."}</span>
           </div>
 
           <button
