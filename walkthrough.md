@@ -25,6 +25,31 @@ Le projet est divisé en trois pôles principaux, désormais intégralement fonc
   3. **Ticker Ribbon**: A live status shortcut `🟢 0x... [ Déconnecter ]` directly in the ribbon.
   4. **Account Drawer**: Large `Disconnect This Wallet` button with EIP-2255 revocation.
 
+### 🏆 Fonctionnalités Clés pour Remporter le Hackathon (Top 1% Tier)
+- **⚡ Mode Démo Jury 1-Clic (`[ ⚡ Mode Démo Jury ]`)** :
+  - Permet à n'importe quel juge ou évaluateur DoraHacks de tester 100% de la plateforme en 1 clic sans avoir besoin d'installer MetaMask ou de chercher un faucet STT.
+  - Active un compte VIP pré-approvisionné avec **5 420 $ USDso** et permet d'exécuter des ordres de trading, tester le Vault et lancer des duels PvP avec validation visuelle instantanée.
+- **⏱️ Compteur de Blocs Somnia en Temps Réel (< 380ms)** :
+  - Dans le header, un ticker live affiche la production des blocs Somnia Shannon (`#3,489,124`) qui s'incrémente toutes les 380 millisecondes avec animation émeraude, matérialisant physiquement la vitesse des 105 420 TPS.
+- **💰 Gestion Dynamique des Positions, Bouton "Cash Out" & Partage sur X** :
+  - Chaque ordre exécuté s'ajoute dynamiquement dans le sous-onglet **Mes Positions**.
+  - Bouton **`[ 💸 Vendre / Cash Out ]`** pour clôturer la position en direct et encaisser les gains en USDso.
+  - Bouton viral **`[ 🐦 Partager sur X (Twitter) ]`** ouvrant un tweet pré-rempli avec les tags `@DreamSentinelAI @DreamDEX_io @Somnia_Network`.
+- **🧮 Simulateur Quantitatif Interactif du Critère de Kelly (`KellySimulatorModal.tsx`)** :
+  - Modale interactive avec curseurs de probabilité $p$, cote $b$ et capital pour calculer en temps réel $f^* = \frac{bp - q}{b}$ et l'EV.
+  - Bouton pour injecter directement l'allocation optimale calculée dans le ticket d'ordre du terminal.
+- **📱 Démonstrateur Interactif Telegram Mini-App (`TelegramMiniAppModal.tsx`)** :
+  - Mockup de smartphone interactif montrant le bot Telegram recevant des alertes push d'arbitrage DreamDEX vs Polymarket avec exécution en 1-clic.
+- **🔊 Synthétiseur Sonore Haptique Web3 (`sounds.ts`)** :
+  - Générateur d'effets sonores futuristes procéduraux basé sur la Web Audio API native (0 ko téléchargé, latence zéro).
+  - Retour audio lors des ordres (`trade`), de l'activation du mode démo (`demo`), des dépôts (`success`) et des clics tactiles (`click`). Bouton de bascule **`[ 🔊 / 🔇 ]`** intégré au header.
+- **💎 Schéma du "Flywheel Économique & Monétisation" (Onglet Vaults)** :
+  - Démonstration claire pour les jurys et investisseurs du modèle économique pérenne de DreamSentinel AI sur Somnia L1 :
+    1. *5% Performance Fee* sur les profits nets générés par l'essaim bayésien (High-Water Mark).
+    2. *0.5% PvP Escrow Fee* prélevé sur les duels 60s régis par `PvPDuelEscrow.sol`.
+    3. *CLOB Maker Rebates* : Rémunération de tenue de marché capturée sur les spreads DreamDEX.
+    4. *Token Buyback & Staking* : 70% des revenus réinjectés en rachat et redistribution de rendement.
+
 ### 🎬 Hub Vidéo Démo & Visite Interactive (Avec Voix-Off IA Studio Intégrée)
 - **Voix-Off IA Studio Officielle (Anglais US & Français)** :
   - Générée par modèle neuronal HD (`ChristopherNeural` en Anglais US et `HenriNeural` en Français).
