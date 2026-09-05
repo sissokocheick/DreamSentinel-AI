@@ -5,12 +5,15 @@ import {
   TrendingUp, TrendingDown, Cpu, Zap, Shield, Bot, LineChart, 
   Wallet, Award, Activity, ArrowUpRight, Sparkles, MessageSquare, 
   Layers, CheckCircle, AlertTriangle, RefreshCw, Send, Check, ChevronRight, DollarSign, Swords,
-  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft, Volume2, VolumeX
+  ExternalLink, Copy, X, Link as LinkIcon, LogOut, Play, Video, Film, ChevronLeft, Volume2, VolumeX,
+  Calculator, Smartphone, Share2
 } from 'lucide-react';
 import { Market, AgentProfile, ThoughtLog, SwarmStatus, ActionCard, CopilotMessage } from '../types';
 import { fetchMarkets, fetchAgents, sendCopilotMessage, executeTrade, getFallbackMarkets, getFallbackSwarmStatus } from '../lib/api';
 import { translations, Language } from '../lib/translations';
 import { playWeb3Sound } from '../lib/sounds';
+import { KellySimulatorModal } from '../components/KellySimulatorModal';
+import { TelegramMiniAppModal } from '../components/TelegramMiniAppModal';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 
@@ -189,6 +192,8 @@ export default function Home() {
   const [selectedVaultDeposit, setSelectedVaultDeposit] = useState<any | null>(null);
   const [depositAmount, setDepositAmount] = useState<number>(250);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
+  const [showKellyModal, setShowKellyModal] = useState<boolean>(false);
+  const [showTelegramModal, setShowTelegramModal] = useState<boolean>(false);
 
   // Load saved video URL from localStorage if any
   useEffect(() => {
@@ -261,6 +266,84 @@ export default function Home() {
     setVaultUserBalance(1250.00);
     playWeb3Sound('demo', soundEnabled);
     toast.success(t('judge_demo_toast'));
+  };
+
+  // Somnia Shannon Live Block Production Ticker (~380ms reactive block time)
+  const [somniaBlock, setSomniaBlock] = useState<number>(3489124);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSomniaBlock(prev => prev + 1);
+    }, 380);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Dynamic User Positions Interface & State
+  interface UserPosition {
+    id: string;
+    marketId: string;
+    marketName: string;
+    outcome: 'YES' | 'NO';
+    shares: number;
+    entryPrice: number;
+    currentPrice: number;
+    totalInvested: number;
+    unrealizedPnl: number;
+    unrealizedPnlPct: number;
+    timestamp: number;
+    status: 'ACTIVE' | 'CLOSED';
+  }
+
+  const [userPositions, setUserPositions] = useState<UserPosition[]>([
+    {
+      id: 'pos-1',
+      marketId: 'somnia-btc-100k-5m',
+      marketName: 'BTC > $98,500 (5m)',
+      outcome: 'YES',
+      shares: 196,
+      entryPrice: 0.51,
+      currentPrice: 0.55,
+      totalInvested: 100,
+      unrealizedPnl: 7.80,
+      unrealizedPnlPct: 7.8,
+      timestamp: Date.now() - 180000,
+      status: 'ACTIVE'
+    },
+    {
+      id: 'pos-2',
+      marketId: 'somnia-tps-100k',
+      marketName: 'Somnia Shannon > 100k TPS',
+      outcome: 'YES',
+      shares: 350,
+      entryPrice: 0.78,
+      currentPrice: 0.85,
+      totalInvested: 273,
+      unrealizedPnl: 24.50,
+      unrealizedPnlPct: 9.0,
+      timestamp: Date.now() - 450000,
+      status: 'ACTIVE'
+    }
+  ]);
+
+  // Cash Out / Close Position
+  const handleCashOutPosition = (posId: string) => {
+    const pos = userPositions.find(p => p.id === posId);
+    if (!pos || pos.status === 'CLOSED') return;
+
+    const returnAmount = Math.round(pos.shares * pos.currentPrice);
+    setUsdsoBalance(prev => prev + returnAmount);
+    setUserPositions(prev => prev.map(p => p.id === posId ? { ...p, status: 'CLOSED' } : p));
+    playWeb3Sound('success', soundEnabled);
+    toast.success(lang === 'en' ? `Position closed! +$${returnAmount} USDso credited to wallet.` : `Position clôturée ! +${returnAmount} $ USDso crédités sur votre portefeuille.`, {
+      icon: '💰'
+    });
+  };
+
+  // Viral 1-Click Share on X (Twitter)
+  const handleShareOnX = (pos: UserPosition) => {
+    const tweetText = encodeURIComponent(
+      `I just placed an AI-backed prediction on "${pos.marketName}" via @DreamSentinelAI on @Somnia_Network! 🚀\n\n⚡ 105,420 TPS & sub-cent gas fees on Somnia L1.\nTry it live: https://dream-sentinel-ai.vercel.app\n\n#Somnia #DreamDEX #DeFi #Web3`
+    );
+    window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
   };
 
   // Check URL query parameters for tab and modal routing (e.g. ?tab=swarm, ?modal=contracts)
@@ -614,6 +697,24 @@ export default function Home() {
       setIsTrading(false);
       setUsdsoBalance(prev => Math.max(0, prev - amountVal));
       playWeb3Sound('trade', soundEnabled);
+
+      const sharesAcquired = Math.round(amountVal / priceVal);
+      const newPos: UserPosition = {
+        id: `pos_${Date.now()}`,
+        marketId: currentMarket.market_id,
+        marketName: currentMarket.title || 'Event Market',
+        outcome: outcomeStr,
+        shares: sharesAcquired,
+        entryPrice: priceVal,
+        currentPrice: priceVal,
+        totalInvested: amountVal,
+        unrealizedPnl: 0,
+        unrealizedPnlPct: 0,
+        timestamp: Date.now(),
+        status: 'ACTIVE'
+      };
+      setUserPositions(prev => [newPos, ...prev]);
+
       setTradeSuccessMsg(`✅ Ordre exécuté sur Somnia L1 : Achat de ${amountVal} USDso de ${outcomeStr} @ $${priceVal.toFixed(2)}.`);
       setTimeout(() => setTradeSuccessMsg(null), 5000);
     }, 400);
@@ -732,11 +833,40 @@ export default function Home() {
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-200">4</span>
             </button>
 
-            {/* Somnia Shannon Network Indicator */}
-            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono">
+            {/* Somnia Shannon Network & Live Block Indicator */}
+            <div className="hidden xl:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs text-emerald-400 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span>Somnia (50312)</span>
+              <span className="text-[10px] text-slate-400 font-mono border-l border-white/10 pl-2">
+                #{somniaBlock.toLocaleString()}
+              </span>
             </div>
+
+            {/* Kelly Criterion Simulator Trigger */}
+            <button
+              onClick={() => {
+                setShowKellyModal(true);
+                playWeb3Sound('click', soundEnabled);
+              }}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-xs text-purple-300 font-semibold transition-all shadow-sm active:scale-95"
+              title={t('kelly_modal_title')}
+            >
+              <Calculator className="w-3.5 h-3.5 text-purple-400" />
+              <span>{t('kelly_btn')}</span>
+            </button>
+
+            {/* Telegram Mini-App Trigger */}
+            <button
+              onClick={() => {
+                setShowTelegramModal(true);
+                playWeb3Sound('click', soundEnabled);
+              }}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 font-semibold transition-all shadow-sm active:scale-95"
+              title={t('telegram_modal_title')}
+            >
+              <Smartphone className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{t('telegram_btn')}</span>
+            </button>
 
             {/* Judge 1-Click Demo VIP Access Button */}
             <button
@@ -1251,27 +1381,85 @@ export default function Home() {
                   {/* SUB-TAB D: MY POSITIONS */}
                   {terminalSubTab === 'positions' && (
                     <div className="space-y-3 font-mono text-xs">
-                      <div className="flex justify-between text-slate-500 pb-1 border-b border-white/[0.06] text-[11px]">
-                        <span>Market</span>
-                        <span>Outcome</span>
-                        <span>Shares</span>
-                        <span>Entry Price</span>
-                        <span>Mark Price</span>
-                        <span>Unrealized P&L</span>
-                      </div>
-                      {[
-                        { market: 'BTC-USD-5M', outcome: 'YES', shares: '196', entry: '$0.51', mark: '$0.51', pnl: '+$0.00', pnlColor: 'text-slate-300' },
-                        { market: 'SOMNIA-TPS', outcome: 'YES', shares: '350', entry: '$0.78', mark: '$0.82', pnl: '+$14.00 (+5.1%)', pnlColor: 'text-emerald-400' },
-                      ].map((pos, idx) => (
-                        <div key={idx} className="flex justify-between items-center py-2 border-b border-white/[0.04] px-1 rounded bg-slate-900/40">
-                          <span className="font-bold text-slate-200">{pos.market}</span>
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">{pos.outcome}</span>
-                          <span className="text-slate-300">{pos.shares} {lang === 'en' ? 'shares' : 'parts'}</span>
-                          <span className="text-slate-400">{pos.entry}</span>
-                          <span className="text-slate-200 font-bold">{pos.mark}</span>
-                          <span className={`font-bold ${pos.pnlColor}`}>{pos.pnl}</span>
+                      {userPositions.length === 0 ? (
+                        <div className="text-center py-8 text-slate-500 text-xs font-sans">
+                          {t('no_positions')}
                         </div>
-                      ))}
+                      ) : (
+                        <>
+                          <div className="hidden sm:grid grid-cols-7 text-slate-500 pb-1 border-b border-white/[0.06] text-[11px]">
+                            <span className="col-span-2">Market</span>
+                            <span>Outcome</span>
+                            <span>Shares</span>
+                            <span>Entry</span>
+                            <span>P&L</span>
+                            <span className="text-right">Action</span>
+                          </div>
+                          {userPositions.map((pos) => {
+                            const isPositive = pos.unrealizedPnl >= 0;
+                            const isClosed = pos.status === 'CLOSED';
+                            return (
+                              <div
+                                key={pos.id}
+                                className={`flex flex-col sm:grid sm:grid-cols-7 items-start sm:items-center py-2.5 px-3 rounded-2xl border transition-all gap-2 sm:gap-0 ${
+                                  isClosed
+                                    ? 'bg-slate-950/40 border-white/[0.04] opacity-50'
+                                    : 'bg-slate-900/60 border-white/[0.08] hover:border-cyan-500/30'
+                                }`}
+                              >
+                                <div className="col-span-2 flex flex-col pr-2">
+                                  <span className="font-bold text-slate-200 truncate">{pos.marketName}</span>
+                                  <span className="text-[10px] text-slate-500 font-sans">
+                                    {new Date(pos.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                                    pos.outcome === 'YES' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                                  }`}>
+                                    {pos.outcome}
+                                  </span>
+                                </div>
+                                <div className="text-slate-300 font-bold">
+                                  {pos.shares} <span className="text-[10px] text-slate-500 font-normal">{lang === 'en' ? 'sh' : 'pts'}</span>
+                                </div>
+                                <div className="text-slate-400">
+                                  ${pos.entryPrice.toFixed(2)}
+                                </div>
+                                <div>
+                                  <span className={`font-bold ${isClosed ? 'text-slate-500' : isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {isClosed ? 'Settled' : `${isPositive ? '+' : ''}$${pos.unrealizedPnl.toFixed(2)} (${isPositive ? '+' : ''}${pos.unrealizedPnlPct}%)`}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto">
+                                  {!isClosed ? (
+                                    <>
+                                      <button
+                                        onClick={() => handleCashOutPosition(pos.id)}
+                                        className="px-2.5 py-1 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-[11px] transition-all flex items-center gap-1 active:scale-95"
+                                        title={t('cashout_btn')}
+                                      >
+                                        <span>{t('cashout_btn')}</span>
+                                      </button>
+                                      <button
+                                        onClick={() => handleShareOnX(pos)}
+                                        className="p-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 transition-all active:scale-95"
+                                        title={t('share_x_btn')}
+                                      >
+                                        <Share2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <span className="text-[10px] text-slate-500 font-sans italic">
+                                      {lang === 'en' ? 'Closed' : 'Clôturée'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -2874,6 +3062,47 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 6. Quantitative Kelly Simulator Modal */}
+      <KellySimulatorModal
+        isOpen={showKellyModal}
+        onClose={() => setShowKellyModal(false)}
+        lang={lang}
+        currentBankroll={usdsoBalance}
+        onApplySize={(size) => {
+          setTradeAmount(size);
+          toast.success(lang === 'en' ? `Applied Kelly sizing of $${size} USDso to order ticket!` : `Taille Kelly de ${size} $ USDso appliquée au ticket !`, {
+            icon: '🧮'
+          });
+        }}
+      />
+
+      {/* 7. Telegram Mini-App Preview Modal */}
+      <TelegramMiniAppModal
+        isOpen={showTelegramModal}
+        onClose={() => setShowTelegramModal(false)}
+        lang={lang}
+        onSimulateTrade={(amount) => {
+          setUsdsoBalance(prev => Math.max(0, prev - amount));
+          playWeb3Sound('trade', soundEnabled);
+          const newPos: UserPosition = {
+            id: `pos_${Date.now()}`,
+            marketId: 'somnia-btc-100k-5m',
+            marketName: 'BTC > $98,500 (5m) [Telegram Mini-App]',
+            outcome: 'YES',
+            shares: 196,
+            entryPrice: 0.51,
+            currentPrice: 0.55,
+            totalInvested: 100,
+            unrealizedPnl: 7.84,
+            unrealizedPnlPct: 7.8,
+            timestamp: Date.now(),
+            status: 'ACTIVE'
+          };
+          setUserPositions(prev => [newPos, ...prev]);
+          toast.success(t('telegram_sim_success'), { icon: '📱' });
+        }}
+      />
 
     </div>
   );
